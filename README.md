@@ -1,0 +1,128 @@
+# Pension Planner
+
+A web application for planning and tracking pensions. It currently provides a login/registration flow and a user settings backend, with a pension dashboard planned for later phases.
+
+- **Backend**: Java 25, Spring Boot 3.5, REST API under `/api/v1`, JWT-based auth, SQLite database with Flyway migrations
+- **Frontend**: React 19 + TypeScript, Vite, PrimeReact, TanStack Query
+- **Deployment**: single Spring Boot fat JAR serving the built frontend as static resources, runnable via Docker Compose
+
+## Project structure
+
+```
+pension-planner/
+├── backend/                  Spring Boot application (Maven)
+│   └── src/main/java/com/pensionplanner/
+│       ├── auth/             Login, registration, JWT issuance
+│       ├── security/         JWT filter, current-user resolution
+│       ├── user/             User entity, profile settings API
+│       ├── pension/          Pension entities and repositories (dashboard Phase 2)
+│       ├── income/           State pension and other income entities
+│       ├── audit/            Audit history entities and service
+│       ├── config/           Security, data source, JWT properties
+│       └── common/           Error handling, DTOs
+│       └── resources/
+│           ├── application.yml
+│           └── db/migration/ Flyway SQL migrations
+├── frontend/                 React SPA (Vite)
+│   └── src/
+│       ├── api/              Axios client and API functions
+│       ├── auth/             Auth context (login/logout), route guard
+│       └── pages/            Login, Register, Home
+├── .run/                     IntelliJ run configurations
+├── docker-compose.yml
+└── Dockerfile
+```
+
+The frontend calls the backend through Vite's dev-server proxy: `/api` on port 5173 is forwarded to `http://localhost:8080`. The API is stateless — the backend issues a signed JWT on login, stored in an HttpOnly cookie (`pp_jwt`).
+
+## Prerequisites
+
+- Java 25 (JDK)
+- Node.js 20+ and npm
+- Maven (optional — IntelliJ can manage Maven for you)
+- IntelliJ IDEA (recommended)
+
+## Running locally
+
+### Option 1: IntelliJ (recommended)
+
+1. Open the **repository root** (`pension-planner/`) as the project.
+2. When IntelliJ prompts, import `backend/pom.xml` as a Maven project (this creates the `pension-planner-backend` module referenced by the run configs).
+3. Choose a run configuration from the dropdown (defined in `.run/`):
+   - **Pension Planner Backend** — starts the Spring Boot app on `http://localhost:8080`
+   - **Pension Planner Frontend (dev)** — starts the Vite dev server on `http://localhost:5173`
+   - **Pension Planner (all)** — compound configuration that starts both
+4. Open `http://localhost:5173`. Registration is enabled by default (`ALLOW_REGISTRATION=true`), so you can create an account on the sign-in screen.
+
+### Option 2: Command line
+
+Terminal 1 — backend:
+
+```bash
+cd backend
+DATABASE_PATH=./data/pension.db mvn spring-boot:run
+```
+
+Terminal 2 — frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Option 3: Docker
+
+```bash
+docker compose up --build
+```
+
+This serves the full app (backend + built frontend) at `http://localhost:8080`. The SQLite database is persisted in `./data` (mounted as a volume).
+
+## Configuration
+
+All settings are environment variables (defaults shown):
+
+| Variable             | Default         | Description                                                        |
+| -------------------- | --------------- | ------------------------------------------------------------------ |
+| `DATABASE_PATH`      | `/data/pension.db` | File path of the SQLite database (created automatically)          |
+| `SERVER_PORT`        | `8080`          | Backend HTTP port                                                   |
+| `ALLOW_REGISTRATION` | `true` (Docker) | When `false`, the register endpoint is disabled                     |
+| `JWT_SECRET`         | *(empty)*       | Secret used to sign JWTs. Leave empty for a random per-run secret   |
+| `COOKIE_SECURE`      | `false`         | Set `true` to send the JWT cookie only over HTTPS                   |
+
+## Debugging
+
+- **Backend**: run **Pension Planner Backend** in IntelliJ and set breakpoints in Java code; they are hit when the API is called from the frontend. The run config includes `--enable-native-access=ALL-UNNAMED` to silence harmless SQLite native-access warnings (add it to any manual `java -jar` launches too).
+- **Frontend**: use your browser's DevTools. Vite hot-reloads on save — hard-refresh (`Ctrl+Shift+R`) if changes don't appear.
+- **Tests**: `mvn test` from `backend/` runs the backend test suite (unit + integration). Run the frontend build with `npm run build` in `frontend/`.
+
+## Third-party libraries
+
+### Backend
+
+| Library | Why it's used |
+| --- | --- |
+| Spring Boot (starter-web) | Provides embedded Tomcat, REST controllers, and JSON (Jackson) serialization for the API. |
+| Spring Boot (starter-security) | Handles authentication/authorization; configured for a stateless, JWT-based security filter chain. |
+| Spring Boot (starter-data-jpa) | Hibernate ORM integration used by the JPA repositories and entities. |
+| Spring Boot (starter-validation) | Bean Validation for request DTOs (e.g., required fields, password length) before they reach services. |
+| sqlite-jdbc (org.xerial) | The JDBC driver that lets the app read and write the embedded SQLite database file. |
+| hibernate-community-dialects | Supplies Hibernate's `SQLiteDialect` so the ORM can talk to SQLite. |
+| Flyway (flyway-core + flyway-database-nc-sqlite) | Version-controlled database migrations (`db/migration/V1__init.sql`); the SQLite community dialect plugin is required for SQLite support. |
+| jjwt (api/impl/jackson) | Creates and verifies the signed JWTs used for the stateless session cookie. |
+| spring-boot-starter-test / spring-security-test | Test framework (JUnit, MockMvc, security test support) for the unit and integration tests. |
+
+### Frontend
+
+| Library | Why it's used |
+| --- | --- |
+| react / react-dom | UI framework; renders the SPA and manages component state. |
+| react-router-dom | Client-side routing between the Login, Register, and Home pages. |
+| @tanstack/react-query | Server-state management: caches API data, handles loading/error states, and keeps the auth user in sync. |
+| axios | HTTP client used by `src/api/` to call the backend API with credentials (cookies). |
+| primereact | PrimeReact UI component library (buttons, inputs, toolbar, password fields) for a consistent look. |
+| primeflex | Utility-first CSS framework (flexbox/grid helpers like `flex flex-column gap-3`) used for layout. |
+| primeicons | Icon set used alongside PrimeReact components. |
+| vite + @vitejs/plugin-react | Dev server with hot module replacement and the production bundler; the plugin adds React fast refresh. |
+| typescript | Static typing for the frontend codebase, enforced via `tsc` in the build. |

@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Pension Planner (all)" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+    <toRun name="Pension Planner Backend" type="Application" />
+    <toRun name="Pension Planner Frontend (dev)" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>

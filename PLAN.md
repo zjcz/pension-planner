@@ -1,0 +1,310 @@
+# Pension Planner — Development Plan
+
+Source of truth: `Pension Planner Functional Specification v9.0`
+Target: Self-hosted / Docker, single container (Spring Boot serving REST + compiled React assets, SQLite via host volume mount).
+
+## Decisions (confirmed)
+
+| Topic            | Choice                                                        |
+|------------------|---------------------------------------------------------------|
+| Backend build    | Maven                                                         |
+| Frontend data    | TanStack React Query + axios/fetch wrapper                    |
+| Testing          | Backend unit + integration (JUnit 5, MockMvc); minimal FE smoke |
+| Phase ordering   | Spec order (see below)                                        |
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Single Docker image                                │
+│                                                     │
+│  ┌─────────────────────┐   ┌─────────────────────┐ │
+│  │ React (Vite/PrimeReact)│→│ Spring Boot 3.3+    │ │
+│  │ compiled static assets │ │ (Java 25, REST)     │ │
+│  └─────────────────────┘   └──────────┬──────────┘ │
+│                                       │            │
+│                              ┌────────▼─────────┐  │
+│                              │ SQLite           │  │
+│                              │ /data/pension.db │  │
+│                              │ (host volume)    │  │
+│                              └──────────────────┘  │
+└─────────────────────────────────────────────────────┘
+```
+
+- **Backend**: Spring Boot 3.3+ (Spring Web, Spring Security, Spring Data JPA or JDBC, Hibernate).
+  Entity listeners (e.g. `@PrePersist/@PreUpdate` or a dedicated audit interceptor) implement audit snapshots.
+- **Frontend**: React + Vite + PrimeReact (Calendar, DataTable, Dialog, Toolbar, Chart), PrimeFlex grid, PrimeIcons.
+- **Auth**: HTTP-only `SameSite=Lax` JWT cookies. Password hashing via BCrypt/Argon2. OIDC-ready design (stateless JWT filter).
+- **Multi-tenancy**: `userId` FK on every table; SecurityContext supplies the user; all repository queries scoped by `userId`.
+- **DB**: `sqlite-jdbc` (or a community SQLite dialect for Hibernate). Schema managed by Flyway for repeatable migrations.
+
+## Repository Layout
+
+```
+pension-planner/
+├── backend/
+│   ├── pom.xml
+│   └── src/main/java/... (com.pensionplanner)
+│   └── src/main/resources/
+│       ├── application.yml
+│       └── db/migration/V1__init.sql ...
+│   └── src/test/java/...
+├── frontend/
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── src/
+│       ├── api/ (axios client + React Query hooks)
+│       ├── components/
+│       ├── pages/
+│       ├── router.tsx
+│       └── theme.ts (PrimeReact)
+├── docker/
+│   └── Dockerfile            # multi-stage: node build → jar build → runtime
+├── docker-compose.yml        # volume mount for /data
+└── PLAN.md
+```
+
+## Database Schema Summary (v9.0)
+
+Every table carries `userId`. Audits are point-in-time snapshots with `action` (`CREATE|UPDATE|DELETE`) + `auditTimestamp`.
+
+- **Users**: `userId` PK, `username` unique, `passwordHash`, `createdAt`.
+- **UserSettings**: `id` PK, `userId` FK unique, `targetIncome` (Real, null), `retirementDate` (DateTime).
+- **Pension**: `pensionId` PK, `userId`, `name` (max 100), `maturityDate`, `notes`, `status`, `statusDate`, `color` (hex, null).
+- **PensionStatement**: `statementId` PK, `pensionId` FK, `userId`, `statementDate`, `planValue`, `projectedAnnualAmount`, `yearlyCharges` (null), `transferValue` (null), `amountPaidIn` (null), `statementNotes` (null).
+- **StatePension**: `id` PK, `userId`, `name`, `annualAmount`, `notes` (null).
+- **OtherIncome**: `id` PK, `userId`, `name`, `annualAmount`, `notes` (null).
+- **Audit tables**: `PensionAudit`, `PensionStatementAudit`, `StatePensionAudit`, `OtherIncomeAudit` — mirror the parent row + `auditId`, `action`, `auditTimestamp`.
+
+## Environment Variables
+
+| Variable             | Description                          | Default          |
+|----------------------|--------------------------------------|------------------|
+| `SERVER_PORT`        | HTTP port for combined service       | `8080`           |
+| `DATABASE_PATH`      | Host file path for SQLite            | `/data/pension.db` |
+| `ALLOW_REGISTRATION` | Toggle public sign-up                | `true`           |
+| `JWT_SECRET`         | JWT signature secret                 | auto-generated   |
+
+---
+
+# Phase 1 — Boilerplate + Authentication
+
+**Goal**: Runnable skeleton; user registration/login/logout with JWT cookie; multi-tenant security foundation; DB schema; audit infrastructure.
+
+### Backend
+- [x] Maven single module `backend`; Spring Boot 3.5.16 parent, Java 25 toolchain.
+- [x] `application.yml` wiring env vars (`SERVER_PORT`, `DATABASE_PATH`, `ALLOW_REGISTRATION`, `JWT_SECRET`, `COOKIE_SECURE`).
+- [x] SQLite datasource + Flyway migration `V1` creating all base + audit tables and indexes (incl. `userId` indexes).
+- [x] Entities/repositories: `User`, `UserSettings`, `Pension`, `PensionStatement`, `StatePension`, `OtherIncome` (+ audit entities).
+- [x] Audit snapshots on create/update/delete for the 4 audited entities.
+- [x] Security: `SecurityFilterChain`, stateless JWT filter reading HTTP-only cookie, BCrypt `PasswordEncoder`, `SecurityContext` userId injection.
+- [x] Auth endpoints: `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/me`, `GET /api/v1/auth/config`.
+  - Register returns `403` when `ALLOW_REGISTRATION=false`.
+- [x] Multi-tenant service layer pattern: every query/find filtered by `userId` from context.
+- [x] `GET /api/v1/settings` + `PUT /api/v1/settings` for `UserSettings` (targetIncome, retirementDate).
+
+### Frontend
+- [x] Vite + React + TypeScript + PrimeReact setup; PrimeFlex grid; theme import.
+- [x] Axios client with cookie credentials.
+- [x] React Query `QueryClientProvider`.
+- [x] Routes: `/login`, `/register` (hidden when `ALLOW_REGISTRATION=false` — exposed via `GET /api/v1/auth/config`), protected-route guard.
+- [x] Auth context/hooks: `useAuth`, `useLogin`, `useRegister`, `useLogout`.
+
+### Tests
+- [x] Unit: JWT token/cookie handling, settings service, audit service.
+- [x] Integration (MockMvc): register→login→`/me` happy path; register rejected when disabled; cross-user isolation (user B cannot read user A's settings).
+
+### Acceptance
+- [x] `docker compose up` builds a single container (Node build → Maven build → JRE runtime); register/login/logout works; cookie is HttpOnly+SameSite=Lax.
+
+### Phase 1 implementation notes
+- **Flyway 12.6.2** pinned (Boot 3.5 manages 11.x) with the `flyway-database-nc-sqlite` plugin for SQLite support.
+- **Column naming**: camelCase column names from the spec are preserved via `PhysicalNamingStrategyStandardImpl` (Hibernate 6 otherwise rewrites `userId` → `user_id`).
+- **Audit strategy**: snapshots written through `AuditService` at the service layer — `recordCreate` (upon creation), `recordUpdate` (called before mutating, matching the spec's "prior to mutation" wording), `recordDelete`. Rows land in the `*_audit` tables.
+- **JWT secret**: SHA-256-hashed from `JWT_SECRET`; auto-generated per boot when unset (sessions invalidate on restart until a secret is configured).
+- **CSRF**: disabled; mitigated by `SameSite=Lax` cookie. Revisit if stricter controls are needed.
+- **Docker**: `Dockerfile` embeds the frontend build into Spring Boot static resources (single-container model); `docker-compose.yml` mounts `./data:/data`.
+
+---
+
+# Phase 2 — Dashboard (`/`)
+
+**Goal**: Aggregate overview and quick actions.
+
+### Backend
+- [ ] `GET /api/v1/dashboard` aggregate endpoint (all scoped to user):
+  - latest `planValue` per active pension (total current portfolio value);
+  - total projected annual income (pensions latest `projectedAnnualAmount` + StatePension + OtherIncome);
+  - StatePension & OtherIncome summaries;
+  - retirement countdown from `UserSettings.retirementDate`.
+- [ ] `GET /api/v1/pensions` list (already needed for table; color swatch data included).
+
+### Frontend
+- [ ] Summary `Card` widgets (4 cards: Portfolio Value, Projected Income vs `targetIncome`, State Pension & Other Income, Retirement Countdown).
+- [ ] Pensions `DataTable` with color swatch, row quick actions (Edit / Delete / Add Statement) opening the phase-3/4 modals.
+- [ ] Countdown widget rendering into `retirementDate`; progress indicator vs target income.
+
+### Tests
+- [ ] Backend: dashboard aggregation with empty data, single pension, multiple pensions + StatePension/OtherIncome; correct latest-statement pick.
+- [ ] FE smoke: dashboard renders cards and table.
+
+### Acceptance
+- [ ] Dashboard shows correct totals and countdown; row actions wired to modals.
+
+---
+
+# Phase 3 — Maintain Pension
+
+**Goal**: Full CRUD on `Pension` + audit trail; used from Dashboard modals and Pension Details.
+
+### Backend
+- [ ] `PensionService` CRUD (scoped by `userId`):
+  - `POST /api/v1/pensions`, `GET /api/v1/pensions`, `GET /api/v1/pensions/{id}`, `PUT /api/v1/pensions/{id}`, `DELETE /api/v1/pensions/{id}`.
+- [ ] Validation: `name` required & ≤100 chars, `maturityDate` required, `status` enum, `color` hex format, `statusDate` defaults to today.
+- [ ] Audit: snapshots on create/update/delete persisted to `PensionAudit`.
+- [ ] Deletion policy decision: block or cascade statements (recommend cascade + audit, or soft-delete; confirm in phase review).
+
+### Frontend
+- [ ] `PensionFormDialog` (InputText, Calendar with `view="month"` + yearNavigator + yearRange e.g. 2026:2080 for maturityDate, ColorPicker, Dropdown for status, InputTextarea for notes).
+- [ ] Calendar for `statusDate` as standard icon picker defaulting to today.
+- [ ] React Query mutations `useCreatePension`, `useUpdatePension`, `useDeletePension`; cache invalidation of dashboard + pensions list.
+
+### Tests
+- [ ] Backend: create/update/delete scoped to user; validation errors; audit rows written with correct action/timestamp.
+- [ ] FE smoke: modal create/edit flow.
+
+### Acceptance
+- [ ] Pensions CRUD works from Dashboard and (once built) Pension Details; audit history populated.
+
+---
+
+# Phase 4 — Maintain Statements
+
+**Goal**: CRUD on `PensionStatement` within a pension, plus Pension Details view with performance chart.
+
+### Backend
+- [ ] `StatementService` CRUD:
+  - `POST /api/v1/pensions/{pensionId}/statements`, `GET` list, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`.
+- [ ] Ownership checks: statement must belong to user AND to the requested pension.
+- [ ] Audit snapshots to `PensionStatementAudit` on create/update/delete.
+- [ ] Validation: `statementDate` required (historical/recent), `planValue` + `projectedAnnualAmount` required, optionals (`yearlyCharges`, `transferValue`, `amountPaidIn`, `statementNotes`).
+
+### Frontend
+- [ ] Pension Details page `/pensions/{id}`: overview panel (name, maturity, notes, status, statusDate, color swatch).
+- [ ] Performance bar chart: `planValue` vs `statementDate`, grouped by year, colored by pension color (PrimeReact `Chart`).
+- [ ] Statements `DataTable` with all fields + per-row Edit/Delete.
+- [ ] `Add Statement` in `Toolbar`; statement dialog uses Calendar with `manualInput={true}`, `monthNavigator`, `yearNavigator`, `showButtonBar={true}`.
+- [ ] React Query hooks for statements; invalidation of pension detail + dashboard.
+
+### Tests
+- [ ] Backend: statement CRUD scoped to user+pension; cross-pension statement access denied; audit rows.
+- [ ] FE smoke: statement dialog opens and submits.
+
+### Acceptance
+- [ ] Statements CRUD works; chart renders from statement history; dashboard totals use latest statement.
+
+---
+
+# Phase 5 — Maintain State Pension
+
+**Goal**: Manage the single State Pension record per user.
+
+### Backend
+- [ ] `StatePensionService` (one record per user; upsert semantics):
+  - `GET /api/v1/state-pension`, `PUT /api/v1/state-pension` (create-or-update).
+- [ ] Audit snapshots to `StatePensionAudit`.
+- [ ] Validation: `annualAmount` required, `name` default provided.
+
+### Frontend
+- [ ] `/state-pension` form page (InputNumber for annualAmount, InputText for name, InputTextarea for notes) with save.
+- [ ] React Query `useStatePension`, `useSaveStatePension`; invalidate dashboard + analytics.
+
+### Tests
+- [ ] Backend: upsert creates once, updates thereafter; audit history; user isolation.
+- [ ] FE smoke: form loads existing record and saves.
+
+### Acceptance
+- [ ] State pension editable from dedicated page; reflected in dashboard totals.
+
+---
+
+# Phase 6 — Maintain Other Income
+
+**Goal**: CRUD on `OtherIncome` + chart page.
+
+### Backend
+- [ ] `OtherIncomeService` CRUD (scoped by `userId`):
+  - `GET /api/v1/other-income`, `POST`, `PUT /{id}`, `DELETE /{id}`.
+- [ ] Audit snapshots to `OtherIncomeAudit`.
+- [ ] Validation: `name`, `annualAmount` required.
+
+### Frontend
+- [ ] `/other-income` page: `Toolbar` with Add button, `DataTable` (name, annualAmount, notes) with per-row Edit/Delete, plus bar chart of `annualAmount` vs `name` (dynamic colors).
+- [ ] Dialog for create/edit; React Query hooks; invalidate dashboard + analytics.
+
+### Tests
+- [ ] Backend: CRUD scoped to user; audit rows; validation.
+- [ ] FE smoke: table + chart render; add/edit/delete flows.
+
+### Acceptance
+- [ ] Other income streams fully maintained; chart updates.
+
+---
+
+# Phase 7 — Analytics (`/analytics`)
+
+**Goal**: Projection + comparison charts per spec §4.2.5.
+
+### Backend
+- [ ] `GET /api/v1/analytics` aggregate endpoint returning per-pension series and totals:
+  - statements time series (planValue, amountPaidIn, yearlyCharges);
+  - projections to `retirementDate` (extrapolate from latest planValue / projectedAnnualAmount trajectory);
+  - StatePension + OtherIncome annual amounts;
+  - `targetIncome` from settings.
+- [ ] Keep projection math server-side so frontend stays presentational.
+
+### Frontend
+- [ ] Retirement Runway / Growth Projection chart: multi-year forward projection with vertical line at `retirementDate` + milestone markers.
+- [ ] Growth vs. Cost grouped bar/line: per pension (planValue − amountPaidIn) vs cumulative yearlyCharges.
+- [ ] Combined Growth vs. Target stacked bar: per-pension segments (stored colors) + StatePension + OtherIncome, with horizontal `targetIncome` overlay line.
+- [ ] Historical Portfolio Trend: multi-line chart of individual + total planValue over past statement dates.
+- [ ] Consistent color mapping util shared with Dashboard/Pension views.
+
+### Tests
+- [ ] Backend: projection math unit tests (simple + compound growth, edge dates); aggregation across pensions.
+- [ ] FE smoke: all four charts render with fixture data.
+
+### Acceptance
+- [ ] Charts reflect DB data and targets; reference line at retirement date.
+
+---
+
+# Phase 8 — Settings, Operations & Polish
+
+**Goal**: Settings page + production hardening + docs.
+
+### Backend
+- [ ] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
+- [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
+- [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
+- [ ] GraalVM native-image note/optional profile (spec §1.2).
+
+### Frontend
+- [ ] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
+- [ ] Auth UX: show/hide registration based on server flag; session expiry handling; consistent empty/loading/error states across pages.
+
+### Tests
+- [ ] Backend: settings update; env-flag behavior end-to-end; health endpoint.
+- [ ] FE smoke: settings save reflects on dashboard.
+
+### Acceptance
+- [ ] Single container runs end-to-end; settings drive dashboard + analytics; README covers env vars and compose usage.
+
+---
+
+## Cross-cutting considerations
+
+- **Audit review**: Provide read API for audit tables (e.g. `GET /api/v1/audit/{entity}/{id}`) or leave for a later "History" phase — confirm scope in Phase 1.
+- **Deletion policy** for pensions with statements (cascade vs block vs soft-delete) — decide during Phase 3.
+- **Currency/rounding**: standardize monetary handling (2-dp) across calculations.
+- **Migration path to OIDC** (spec §2.2): keep auth abstraction (JwtService) isolated for later provider swap.

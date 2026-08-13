@@ -1,0 +1,16 @@
+services:
+  pension-planner:
+    build: .
+    image: pension-planner:latest
+    container_name: pension-planner
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: "8080"
+      DATABASE_PATH: /data/pension.db
+      ALLOW_REGISTRATION: "true"
+      JWT_SECRET: ${JWT_SECRET:-}
+      COOKIE_SECURE: "false"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
