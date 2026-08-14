@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pension")
@@ -27,7 +27,7 @@ public class Pension {
     private String name;
 
     @Column(name = "maturityDate", nullable = false)
-    private Instant maturityDate;
+    private LocalDate maturityDate;
 
     @Column(name = "notes")
     private String notes;
@@ -37,7 +37,7 @@ public class Pension {
     private PensionStatus status;
 
     @Column(name = "statusDate")
-    private Instant statusDate;
+    private LocalDate statusDate;
 
     @Column(name = "color")
     private String color;
@@ -66,11 +66,11 @@ public class Pension {
         this.name = name;
     }
 
-    public Instant getMaturityDate() {
+    public LocalDate getMaturityDate() {
         return maturityDate;
     }
 
-    public void setMaturityDate(Instant maturityDate) {
+    public void setMaturityDate(LocalDate maturityDate) {
         this.maturityDate = maturityDate;
     }
 
@@ -90,11 +90,11 @@ public class Pension {
         this.status = status;
     }
 
-    public Instant getStatusDate() {
+    public LocalDate getStatusDate() {
         return statusDate;
     }
 
-    public void setStatusDate(Instant statusDate) {
+    public void setStatusDate(LocalDate statusDate) {
         this.statusDate = statusDate;
     }
 

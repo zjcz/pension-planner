@@ -23,7 +23,7 @@ public class OtherIncome {
     private String name;
 
     @Column(name = "annualAmount", nullable = false)
-    private Double annualAmount;
+    private Long annualAmount;
 
     @Column(name = "notes")
     private String notes;
@@ -52,11 +52,11 @@ public class OtherIncome {
         this.name = name;
     }
 
-    public Double getAnnualAmount() {
+    public Long getAnnualAmount() {
         return annualAmount;
     }
 
-    public void setAnnualAmount(Double annualAmount) {
+    public void setAnnualAmount(Long annualAmount) {
         this.annualAmount = annualAmount;
     }
 

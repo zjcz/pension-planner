@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pension_statement_audit")
@@ -34,22 +35,22 @@ public class PensionStatementAudit {
     private Long userId;
 
     @Column(name = "statementDate")
-    private Instant statementDate;
+    private LocalDate statementDate;
 
     @Column(name = "planValue")
-    private Double planValue;
+    private Long planValue;
 
     @Column(name = "projectedAnnualAmount")
-    private Double projectedAnnualAmount;
+    private Long projectedAnnualAmount;
 
     @Column(name = "yearlyCharges")
-    private Double yearlyCharges;
+    private Long yearlyCharges;
 
     @Column(name = "transferValue")
-    private Double transferValue;
+    private Long transferValue;
 
     @Column(name = "amountPaidIn")
-    private Double amountPaidIn;
+    private Long amountPaidIn;
 
     @Column(name = "statementNotes")
     private String statementNotes;
@@ -102,51 +103,51 @@ public class PensionStatementAudit {
         this.userId = userId;
     }
 
-    public Instant getStatementDate() {
+    public LocalDate getStatementDate() {
         return statementDate;
     }
 
-    public void setStatementDate(Instant statementDate) {
+    public void setStatementDate(LocalDate statementDate) {
         this.statementDate = statementDate;
     }
 
-    public Double getPlanValue() {
+    public Long getPlanValue() {
         return planValue;
     }
 
-    public void setPlanValue(Double planValue) {
+    public void setPlanValue(Long planValue) {
         this.planValue = planValue;
     }
 
-    public Double getProjectedAnnualAmount() {
+    public Long getProjectedAnnualAmount() {
         return projectedAnnualAmount;
     }
 
-    public void setProjectedAnnualAmount(Double projectedAnnualAmount) {
+    public void setProjectedAnnualAmount(Long projectedAnnualAmount) {
         this.projectedAnnualAmount = projectedAnnualAmount;
     }
 
-    public Double getYearlyCharges() {
+    public Long getYearlyCharges() {
         return yearlyCharges;
     }
 
-    public void setYearlyCharges(Double yearlyCharges) {
+    public void setYearlyCharges(Long yearlyCharges) {
         this.yearlyCharges = yearlyCharges;
     }
 
-    public Double getTransferValue() {
+    public Long getTransferValue() {
         return transferValue;
     }
 
-    public void setTransferValue(Double transferValue) {
+    public void setTransferValue(Long transferValue) {
         this.transferValue = transferValue;
     }
 
-    public Double getAmountPaidIn() {
+    public Long getAmountPaidIn() {
         return amountPaidIn;
     }
 
-    public void setAmountPaidIn(Double amountPaidIn) {
+    public void setAmountPaidIn(Long amountPaidIn) {
         this.amountPaidIn = amountPaidIn;
     }
 

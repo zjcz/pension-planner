@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Service
 public class UserSettingsService {
@@ -23,7 +23,7 @@ public class UserSettingsService {
     }
 
     @Transactional
-    public UserSettings update(Long userId, Double targetIncome, Instant retirementDate) {
+    public UserSettings update(Long userId, Long targetIncome, LocalDate retirementDate) {
         UserSettings settings = repository.findByUserId(userId).orElseGet(() -> {
             UserSettings created = new UserSettings();
             created.setUserId(userId);

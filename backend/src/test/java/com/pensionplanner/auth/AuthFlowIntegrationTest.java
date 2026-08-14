@@ -87,13 +87,14 @@ class AuthFlowIntegrationTest {
         mockMvc.perform(put("/api/v1/settings")
                         .cookie(daveCookie)
                         .contentType(APPLICATION_JSON)
-                        .content("{\"targetIncome\":50000,\"retirementDate\":\"2045-01-01T00:00:00Z\"}"))
+                        .content("{\"targetIncome\":5000000,\"retirementDate\":\"2045-01-01\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.targetIncome").value(50000.0));
+                .andExpect(jsonPath("$.targetIncome").value(5000000));
 
         mockMvc.perform(get("/api/v1/settings").cookie(daveCookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.targetIncome").value(50000.0));
+                .andExpect(jsonPath("$.targetIncome").value(5000000))
+                .andExpect(jsonPath("$.retirementDate").value("2045-01-01"));
 
         mockMvc.perform(get("/api/v1/settings").cookie(erinCookie))
                 .andExpect(status().isOk())

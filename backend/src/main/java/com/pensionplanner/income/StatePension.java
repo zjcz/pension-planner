@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
-
 @Entity
 @Table(name = "state_pension")
 public class StatePension {
@@ -25,7 +23,7 @@ public class StatePension {
     private String name = "State Pension";
 
     @Column(name = "annualAmount", nullable = false)
-    private Double annualAmount;
+    private Long annualAmount;
 
     @Column(name = "notes")
     private String notes;
@@ -54,11 +52,11 @@ public class StatePension {
         this.name = name;
     }
 
-    public Double getAnnualAmount() {
+    public Long getAnnualAmount() {
         return annualAmount;
     }
 
-    public void setAnnualAmount(Double annualAmount) {
+    public void setAnnualAmount(Long annualAmount) {
         this.annualAmount = annualAmount;
     }
 

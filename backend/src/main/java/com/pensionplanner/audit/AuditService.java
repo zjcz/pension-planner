@@ -112,7 +112,6 @@ public class AuditService {
         audit.setAuditTimestamp(Instant.now());
         audit.setStatementId(statement.getStatementId());
         audit.setPensionId(statement.getPensionId());
-        audit.setUserId(statement.getUserId());
         audit.setStatementDate(statement.getStatementDate());
         audit.setPlanValue(statement.getPlanValue());
         audit.setProjectedAnnualAmount(statement.getProjectedAnnualAmount());

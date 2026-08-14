@@ -8,7 +8,7 @@ import com.pensionplanner.pension.PensionStatement;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -30,10 +30,10 @@ class AuditServiceTest {
         pension.setPensionId(7L);
         pension.setUserId(3L);
         pension.setName("My Pension");
-        pension.setMaturityDate(Instant.parse("2040-01-01T00:00:00Z"));
+        pension.setMaturityDate(LocalDate.of(2040, 1, 1));
         pension.setNotes("some notes");
         pension.setStatus(PensionStatus.ACTIVE);
-        pension.setStatusDate(Instant.parse("2026-01-01T00:00:00Z"));
+        pension.setStatusDate(LocalDate.of(2026, 1, 1));
         pension.setColor("#FF5733");
 
         auditService.recordCreate(pension);
@@ -45,10 +45,10 @@ class AuditServiceTest {
         assertThat(audit.getPensionId()).isEqualTo(7L);
         assertThat(audit.getUserId()).isEqualTo(3L);
         assertThat(audit.getName()).isEqualTo("My Pension");
-        assertThat(audit.getMaturityDate()).isEqualTo(Instant.parse("2040-01-01T00:00:00Z"));
+        assertThat(audit.getMaturityDate()).isEqualTo(LocalDate.of(2040, 1, 1));
         assertThat(audit.getNotes()).isEqualTo("some notes");
         assertThat(audit.getStatus()).isEqualTo("ACTIVE");
-        assertThat(audit.getStatusDate()).isEqualTo(Instant.parse("2026-01-01T00:00:00Z"));
+        assertThat(audit.getStatusDate()).isEqualTo(LocalDate.of(2026, 1, 1));
         assertThat(audit.getColor()).isEqualTo("#FF5733");
         assertThat(audit.getAuditTimestamp()).isNotNull();
     }
@@ -59,7 +59,7 @@ class AuditServiceTest {
         pension.setPensionId(9L);
         pension.setUserId(1L);
         pension.setName("Old Name");
-        pension.setMaturityDate(Instant.parse("2030-01-01T00:00:00Z"));
+        pension.setMaturityDate(LocalDate.of(2030, 1, 1));
         pension.setStatus(PensionStatus.CLOSED);
 
         auditService.recordUpdate(pension);
@@ -78,13 +78,12 @@ class AuditServiceTest {
         PensionStatement statement = new PensionStatement();
         statement.setStatementId(11L);
         statement.setPensionId(7L);
-        statement.setUserId(3L);
-        statement.setStatementDate(Instant.parse("2026-03-31T00:00:00Z"));
-        statement.setPlanValue(100000.0);
-        statement.setProjectedAnnualAmount(4500.0);
-        statement.setYearlyCharges(500.0);
-        statement.setTransferValue(98000.0);
-        statement.setAmountPaidIn(40000.0);
+        statement.setStatementDate(LocalDate.of(2026, 3, 31));
+        statement.setPlanValue(10000000L);
+        statement.setProjectedAnnualAmount(450000L);
+        statement.setYearlyCharges(50000L);
+        statement.setTransferValue(9800000L);
+        statement.setAmountPaidIn(4000000L);
         statement.setStatementNotes("March statement");
 
         auditService.recordCreate(statement);
@@ -95,10 +94,10 @@ class AuditServiceTest {
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_CREATE);
         assertThat(audit.getStatementId()).isEqualTo(11L);
         assertThat(audit.getPensionId()).isEqualTo(7L);
-        assertThat(audit.getPlanValue()).isEqualTo(100000.0);
-        assertThat(audit.getProjectedAnnualAmount()).isEqualTo(4500.0);
-        assertThat(audit.getYearlyCharges()).isEqualTo(500.0);
-        assertThat(audit.getAmountPaidIn()).isEqualTo(40000.0);
+        assertThat(audit.getPlanValue()).isEqualTo(10000000L);
+        assertThat(audit.getProjectedAnnualAmount()).isEqualTo(450000L);
+        assertThat(audit.getYearlyCharges()).isEqualTo(50000L);
+        assertThat(audit.getAmountPaidIn()).isEqualTo(4000000L);
     }
 
     @Test
@@ -107,7 +106,7 @@ class AuditServiceTest {
         statePension.setId(2L);
         statePension.setUserId(3L);
         statePension.setName("State Pension");
-        statePension.setAnnualAmount(11500.0);
+        statePension.setAnnualAmount(1150000L);
         statePension.setNotes("forecast");
 
         auditService.recordUpdate(statePension);
@@ -118,7 +117,7 @@ class AuditServiceTest {
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_UPDATE);
         assertThat(audit.getId()).isEqualTo(2L);
         assertThat(audit.getUserId()).isEqualTo(3L);
-        assertThat(audit.getAnnualAmount()).isEqualTo(11500.0);
+        assertThat(audit.getAnnualAmount()).isEqualTo(1150000L);
     }
 
     @Test
@@ -127,7 +126,7 @@ class AuditServiceTest {
         otherIncome.setId(4L);
         otherIncome.setUserId(3L);
         otherIncome.setName("Rental");
-        otherIncome.setAnnualAmount(6000.0);
+        otherIncome.setAnnualAmount(600000L);
 
         auditService.recordDelete(otherIncome);
 
@@ -136,6 +135,6 @@ class AuditServiceTest {
         OtherIncomeAudit audit = captor.getValue();
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_DELETE);
         assertThat(audit.getName()).isEqualTo("Rental");
-        assertThat(audit.getAnnualAmount()).isEqualTo(6000.0);
+        assertThat(audit.getAnnualAmount()).isEqualTo(600000L);
     }
 }

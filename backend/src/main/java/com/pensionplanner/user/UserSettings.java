@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "user_settings")
@@ -22,10 +22,10 @@ public class UserSettings {
     private Long userId;
 
     @Column(name = "targetIncome")
-    private Double targetIncome;
+    private Long targetIncome;
 
     @Column(name = "retirementDate")
-    private Instant retirementDate;
+    private LocalDate retirementDate;
 
     public Long getId() {
         return id;
@@ -43,19 +43,19 @@ public class UserSettings {
         this.userId = userId;
     }
 
-    public Double getTargetIncome() {
+    public Long getTargetIncome() {
         return targetIncome;
     }
 
-    public void setTargetIncome(Double targetIncome) {
+    public void setTargetIncome(Long targetIncome) {
         this.targetIncome = targetIncome;
     }
 
-    public Instant getRetirementDate() {
+    public LocalDate getRetirementDate() {
         return retirementDate;
     }
 
-    public void setRetirementDate(Instant retirementDate) {
+    public void setRetirementDate(LocalDate retirementDate) {
         this.retirementDate = retirementDate;
     }
 }
