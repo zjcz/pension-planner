@@ -158,23 +158,30 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: Full CRUD on `Pension` + audit trail; used from Dashboard modals and Pension Details.
 
 ### Backend
-- [ ] `PensionService` CRUD (scoped by `userId`):
+- [x] `PensionService` CRUD (scoped by `userId`):
   - `POST /api/v1/pensions`, `GET /api/v1/pensions`, `GET /api/v1/pensions/{id}`, `PUT /api/v1/pensions/{id}`, `DELETE /api/v1/pensions/{id}`.
-- [ ] Validation: `name` required & ≤100 chars, `maturityDate` required, `status` enum, `color` hex format, `statusDate` defaults to today.
-- [ ] Audit: snapshots on create/update/delete persisted to `PensionAudit`.
-- [ ] Deletion policy decision: block or cascade statements (recommend cascade + audit, or soft-delete; confirm in phase review).
+- [x] Validation: `name` required & ≤100 chars, `maturityDate` required, `status` enum, `color` hex format, `statusDate` defaults to today.
+- [x] Audit: snapshots on create/update/delete persisted to `PensionAudit`.
+- [x] Deletion policy decision: block or cascade statements (recommend cascade + audit, or soft-delete; confirm in phase review).
 
 ### Frontend
-- [ ] `PensionFormDialog` (InputText, Calendar with `view="month"` + yearNavigator + yearRange e.g. 2026:2080 for maturityDate, ColorPicker, Dropdown for status, InputTextarea for notes).
-- [ ] Calendar for `statusDate` as standard icon picker defaulting to today.
-- [ ] React Query mutations `useCreatePension`, `useUpdatePension`, `useDeletePension`; cache invalidation of dashboard + pensions list.
+- [x] `PensionFormDialog` (InputText, Calendar with `view="month"` + yearNavigator + yearRange e.g. 2026:2080 for maturityDate, ColorPicker, Dropdown for status, InputTextarea for notes).
+- [x] Calendar for `statusDate` as standard icon picker defaulting to today.
+- [x] React Query mutations `useCreatePension`, `useUpdatePension`, `useDeletePension`; cache invalidation of dashboard + pensions list.
 
 ### Tests
-- [ ] Backend: create/update/delete scoped to user; validation errors; audit rows written with correct action/timestamp.
+- [x] Backend: create/update/delete scoped to user; validation errors; audit rows written with correct action/timestamp.
 - [ ] FE smoke: modal create/edit flow.
 
 ### Acceptance
-- [ ] Pensions CRUD works from Dashboard and (once built) Pension Details; audit history populated.
+- [x] Pensions CRUD works from Dashboard and (once built) Pension Details; audit history populated.
+
+### Phase 3 implementation notes
+- **Deletion policy**: cascade + audit (confirmed in phase review). Statements are audit-snapshotted (DELETE) then removed, then the pension is audited and removed.
+- **UI home**: Phase 2 (dashboard) deferred, so the CRUD table + dialog live on the Home page, ready to be reused by dashboard modals later.
+- **Audit on update**: `recordUpdate` is invoked before mutating, per the Phase 1 convention ("prior to mutation" wording), so UPDATE snapshots capture the pre-change row.
+- **Malformed bodies**: `HttpMessageNotReadableException` (e.g. unknown `status` enum) now returns `400` instead of `500`.
+- **PensionStatement entity**: aligned with the V2 domain refactor (no `userId` column; DB-level `ON DELETE CASCADE` FKs).
 
 ---
 
