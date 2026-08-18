@@ -121,7 +121,18 @@ export default function HomePage() {
           stripedRows
           emptyMessage="No pensions yet. Click “Add Pension” to create one."
         >
-          <Column field="name" header="Name" sortable />
+          <Column
+            header="Name"
+            sortable
+            body={(row: Pension) => (
+              <span
+                className="cursor-pointer text-primary font-semibold hover:underline"
+                onClick={() => navigate(`/pensions/${row.pensionId}`)}
+              >
+                {row.name}
+              </span>
+            )}
+          />
           <Column header="Maturity" body={(row: Pension) => formatMonthYear(row.maturityDate)} sortable />
           <Column header="Status" body={statusBody} sortable />
           <Column header="Status Date" body={(row: Pension) => formatDate(row.statusDate)} sortable />

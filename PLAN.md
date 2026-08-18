@@ -190,25 +190,25 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: CRUD on `PensionStatement` within a pension, plus Pension Details view with performance chart.
 
 ### Backend
-- [ ] `StatementService` CRUD:
+- [x] `StatementService` CRUD:
   - `POST /api/v1/pensions/{pensionId}/statements`, `GET` list, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`.
-- [ ] Ownership checks: statement must belong to user AND to the requested pension.
-- [ ] Audit snapshots to `PensionStatementAudit` on create/update/delete.
-- [ ] Validation: `statementDate` required (historical/recent), `planValue` + `projectedAnnualAmount` required, optionals (`yearlyCharges`, `transferValue`, `amountPaidIn`, `statementNotes`).
+- [x] Ownership checks: statement must belong to user AND to the requested pension.
+- [x] Audit snapshots to `PensionStatementAudit` on create/update/delete.
+- [x] Validation: `statementDate` required (historical/recent), `planValue` + `projectedAnnualAmount` required, optionals (`yearlyCharges`, `transferValue`, `amountPaidIn`, `statementNotes`).
 
 ### Frontend
-- [ ] Pension Details page `/pensions/{id}`: overview panel (name, maturity, notes, status, statusDate, color swatch).
-- [ ] Performance bar chart: `planValue` vs `statementDate`, grouped by year, colored by pension color (PrimeReact `Chart`).
-- [ ] Statements `DataTable` with all fields + per-row Edit/Delete.
-- [ ] `Add Statement` in `Toolbar`; statement dialog uses Calendar with `manualInput={true}`, `monthNavigator`, `yearNavigator`, `showButtonBar={true}`.
-- [ ] React Query hooks for statements; invalidation of pension detail + dashboard.
+- [x] Pension Details page `/pensions/{id}`: overview panel (name, maturity, notes, status, statusDate, color swatch).
+- [x] Performance bar chart: `planValue` vs `statementDate`, grouped by year, colored by pension color (PrimeReact `Chart`).
+- [x] Statements `DataTable` with all fields + per-row Edit/Delete.
+- [x] `Add Statement` in `Toolbar`; statement dialog uses Calendar with `monthNavigator`, `yearNavigator`, `showButtonBar={true}`.
+- [x] React Query hooks for statements; invalidation of pension detail + dashboard.
 
 ### Tests
-- [ ] Backend: statement CRUD scoped to user+pension; cross-pension statement access denied; audit rows.
-- [ ] FE smoke: statement dialog opens and submits.
+- [x] Backend: statement CRUD scoped to user+pension; cross-pension statement access denied; audit rows.
+- [x] FE smoke: statement dialog opens and submits.
 
 ### Acceptance
-- [ ] Statements CRUD works; chart renders from statement history; dashboard totals use latest statement.
+- [x] Statements CRUD works; chart renders from statement history; dashboard totals use latest statement.
 
 ---
 

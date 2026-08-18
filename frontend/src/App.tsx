@@ -4,6 +4,7 @@ import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import PensionDetailsPage from './pages/PensionDetailsPage';
 import RegisterPage from './pages/RegisterPage';
 
 const queryClient = new QueryClient({
@@ -20,7 +21,10 @@ const router = createBrowserRouter([
   { path: '/register', element: <RegisterPage /> },
   {
     element: <ProtectedRoute />,
-    children: [{ path: '/', element: <HomePage /> }],
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/pensions/:id', element: <PensionDetailsPage /> },
+    ],
   },
   { path: '*', element: <Navigate to="/" replace /> },
 ]);

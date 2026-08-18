@@ -9,6 +9,13 @@ export function usePensions() {
   });
 }
 
+export function usePension(pensionId: number) {
+  return useQuery({
+    queryKey: ['pensions', pensionId],
+    queryFn: () => pensionsApi.get(pensionId),
+  });
+}
+
 export function useCreatePension() {
   const queryClient = useQueryClient();
   return useMutation({

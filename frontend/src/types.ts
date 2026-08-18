@@ -32,3 +32,25 @@ export interface PensionRequest {
   status: PensionStatus;
   color: string | null;
 }
+
+export interface Statement {
+  statementId: number;
+  pensionId: number;
+  statementDate: string;
+  planValue: number;
+  projectedAnnualAmount: number;
+  yearlyCharges: number | null;
+  transferValue: number | null;
+  amountPaidIn: number | null;
+  statementNotes: string | null;
+}
+
+export interface StatementRequest {
+  statementDate: string;
+  planValue: number;
+  projectedAnnualAmount: number;
+  yearlyCharges: number | null;
+  transferValue: number | null;
+  amountPaidIn: number | null;
+  statementNotes: string | null;
+}
