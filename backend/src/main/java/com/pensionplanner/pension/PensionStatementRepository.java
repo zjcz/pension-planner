@@ -15,4 +15,6 @@ public interface PensionStatementRepository extends JpaRepository<PensionStateme
             + "(SELECT p.pensionId FROM Pension p WHERE p.userId = :userId)")
     Optional<PensionStatement> findByStatementIdAndUserId(@Param("statementId") Long statementId,
                                                           @Param("userId") Long userId);
+
+    Optional<PensionStatement> findByStatementIdAndPensionId(Long statementId, Long pensionId);
 }

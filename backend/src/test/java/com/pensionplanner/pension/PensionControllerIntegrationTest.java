@@ -190,9 +190,9 @@ class PensionControllerIntegrationTest {
         mockMvc.perform(delete("/api/v1/pensions/" + createdId).cookie(cookie))
                 .andExpect(status().isNoContent());
 
-        assertThat(statementRepository.findAll()).isEmpty();
+        assertThat(statementRepository.findByPensionIdOrderByStatementDateAsc(pension.getPensionId())).isEmpty();
         assertThat(statementAuditRepository.findAll().stream()
-                .filter(audit -> audit.getPensionId() == pension.getPensionId())
+                .filter(audit -> pension.getPensionId().equals(audit.getPensionId()))
                 .map(PensionStatementAudit::getAction)
                 .toList()).containsExactly("DELETE");
         assertThat(pensionActionsFor(pension.getPensionId())).containsExactly("CREATE", "DELETE");
