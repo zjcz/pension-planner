@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
-import { ColorPicker } from 'primereact/colorpicker';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -20,6 +19,30 @@ interface PensionFormDialogProps {
 const STATUS_OPTIONS: { label: string; value: PensionStatus }[] = [
   { label: 'Active', value: 'ACTIVE' },
   { label: 'Closed', value: 'CLOSED' },
+];
+
+const COLOR_OPTIONS = [
+  { label: 'None', value: null },
+  { label: 'Red', value: '#E74C3C' },
+  { label: 'Dark Red', value: '#C0392B' },
+  { label: 'Pink', value: '#E91E63' },
+  { label: 'Purple', value: '#9C27B0' },
+  { label: 'Deep Purple', value: '#673AB7' },
+  { label: 'Indigo', value: '#3F51B5' },
+  { label: 'Blue', value: '#2196F3' },
+  { label: 'Light Blue', value: '#03A9F4' },
+  { label: 'Cyan', value: '#00BCD4' },
+  { label: 'Teal', value: '#009688' },
+  { label: 'Green', value: '#4CAF50' },
+  { label: 'Light Green', value: '#8BC34A' },
+  { label: 'Lime', value: '#CDDC39' },
+  { label: 'Yellow', value: '#FFEB3B' },
+  { label: 'Amber', value: '#FFC107' },
+  { label: 'Orange', value: '#FF9800' },
+  { label: 'Deep Orange', value: '#FF5722' },
+  { label: 'Brown', value: '#795548' },
+  { label: 'Grey', value: '#9E9E9E' },
+  { label: 'Blue Grey', value: '#607D8B' },
 ];
 
 function toDate(value: string | null | undefined): Date | null {
@@ -139,14 +162,37 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
 
         <div className="flex flex-column gap-2">
           <label htmlFor="pension-color">Colour</label>
-          <ColorPicker
+          <Dropdown
             id="pension-color"
-            value={color ?? undefined}
-            onChange={(event) => {
-              const raw = typeof event.value === 'string' ? event.value : null;
-              setColor(raw != null ? (raw.startsWith('#') ? raw : `#${raw}`) : null);
-            }}
-            format="hex"
+            value={color}
+            options={COLOR_OPTIONS}
+            onChange={(event) => setColor(event.value)}
+            valueTemplate={(option) =>
+              option?.value ? (
+                <div className="flex align-items-center gap-2">
+                  <span
+                    className="inline-block border-circle"
+                    style={{ width: '1rem', height: '1rem', backgroundColor: option.value, border: '1px solid var(--surface-border)' }}
+                  />
+                  <span>{option.label}</span>
+                </div>
+              ) : (
+                <span>{option?.label ?? 'None'}</span>
+              )
+            }
+            itemTemplate={(option) =>
+              option?.value ? (
+                <div className="flex align-items-center gap-2">
+                  <span
+                    className="inline-block border-circle"
+                    style={{ width: '1rem', height: '1rem', backgroundColor: option.value, border: '1px solid var(--surface-border)' }}
+                  />
+                  <span>{option.label}</span>
+                </div>
+              ) : (
+                <span>{option?.label ?? 'None'}</span>
+              )
+            }
           />
         </div>
 
