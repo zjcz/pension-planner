@@ -10,6 +10,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { PensionFormDialog } from '../components/PensionFormDialog';
+import { StatePensionDialog } from '../components/StatePensionDialog';
 import { useCreatePension, useDeletePension, usePensions, useUpdatePension } from '../hooks/usePensions';
 import type { Pension, PensionRequest } from '../types';
 
@@ -27,6 +28,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Pension | null>(null);
+  const [spDialogVisible, setSpDialogVisible] = useState(false);
 
   const { data: pensions, isLoading, isError, error } = usePensions();
   const createPension = useCreatePension();
@@ -77,6 +79,7 @@ export default function HomePage() {
   const end = (
     <div className="flex align-items-center gap-3">
       <span className="text-secondary">Signed in as {user?.username}</span>
+      <Button label="Manage State Pension" icon="pi pi-briefcase" onClick={() => setSpDialogVisible(true)} />
       <Button label="Add Pension" icon="pi pi-plus" onClick={openCreate} />
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
     </div>
@@ -147,6 +150,7 @@ export default function HomePage() {
         onHide={() => setDialogVisible(false)}
         onSave={handleSave}
       />
+      <StatePensionDialog visible={spDialogVisible} onHide={() => setSpDialogVisible(false)} />
       <ConfirmDialog />
     </div>
   );

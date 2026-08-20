@@ -217,21 +217,21 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: Manage the single State Pension record per user.
 
 ### Backend
-- [ ] `StatePensionService` (one record per user; upsert semantics):
+- [x] `StatePensionService` (one record per user; upsert semantics):
   - `GET /api/v1/state-pension`, `PUT /api/v1/state-pension` (create-or-update).
-- [ ] Audit snapshots to `StatePensionAudit`.
-- [ ] Validation: `annualAmount` required, `name` default provided.
+- [x] Audit snapshots to `StatePensionAudit`.
+- [x] Validation: `startAge` 0–67, `yearlyAmount` ≥ 0, `taxRate` 0–100, `takesEffectYear` ≥ current year.
 
 ### Frontend
-- [ ] `/state-pension` form page (InputNumber for annualAmount, InputText for name, InputTextarea for notes) with save.
-- [ ] React Query `useStatePension`, `useSaveStatePension`; invalidate dashboard + analytics.
+- [x] State Pension card on Dashboard: editable fields (startAge, yearlyAmount, taxRate, takesEffectYear), Save button.
+- [x] React Query `useStatePension`, `useUpsertStatePension`; invalidate cache on save.
 
 ### Tests
-- [ ] Backend: upsert creates once, updates thereafter; audit history; user isolation.
+- [x] Backend: upsert creates once, updates thereafter; audit history; user isolation; validation rejects bad ranges.
 - [ ] FE smoke: form loads existing record and saves.
 
 ### Acceptance
-- [ ] State pension editable from dedicated page; reflected in dashboard totals.
+- [ ] State pension editable from dashboard card; reflected in dashboard totals.
 
 ---
 

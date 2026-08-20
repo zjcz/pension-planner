@@ -54,3 +54,15 @@ export interface StatementRequest {
   amountPaidIn: number | null;
   statementNotes: string | null;
 }
+
+export interface StatePension {
+  id: number;
+  name: string;
+  yearlyAmount: number;
+  takesEffectYear: number;
+}
+
+export interface StatePensionRequest {
+  yearlyAmount: number;
+  takesEffectYear: number;
+}

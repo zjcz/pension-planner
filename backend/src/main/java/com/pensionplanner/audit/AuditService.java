@@ -129,7 +129,8 @@ public class AuditService {
         audit.setId(statePension.getId());
         audit.setUserId(statePension.getUserId());
         audit.setName(statePension.getName());
-        audit.setAnnualAmount(statePension.getAnnualAmount());
+        audit.setYearlyAmount(statePension.getYearlyAmount());
+        audit.setTakesEffectYear(statePension.getTakesEffectYear());
         audit.setNotes(statePension.getNotes());
         statePensionAuditRepository.save(audit);
     }

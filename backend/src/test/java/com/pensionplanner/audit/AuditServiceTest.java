@@ -106,7 +106,8 @@ class AuditServiceTest {
         statePension.setId(2L);
         statePension.setUserId(3L);
         statePension.setName("State Pension");
-        statePension.setAnnualAmount(1150000L);
+        statePension.setYearlyAmount(1150000L);
+        statePension.setTakesEffectYear(2026);
         statePension.setNotes("forecast");
 
         auditService.recordUpdate(statePension);
@@ -117,7 +118,8 @@ class AuditServiceTest {
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_UPDATE);
         assertThat(audit.getId()).isEqualTo(2L);
         assertThat(audit.getUserId()).isEqualTo(3L);
-        assertThat(audit.getAnnualAmount()).isEqualTo(1150000L);
+        assertThat(audit.getYearlyAmount()).isEqualTo(1150000L);
+        assertThat(audit.getTakesEffectYear()).isEqualTo(2026);
     }
 
     @Test

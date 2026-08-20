@@ -33,8 +33,11 @@ public class StatePensionAudit {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "annualAmount")
-    private Long annualAmount;
+    @Column(name = "yearlyAmount")
+    private Long yearlyAmount;
+
+    @Column(name = "takesEffectYear")
+    private Integer takesEffectYear;
 
     @Column(name = "notes")
     private String notes;
@@ -87,12 +90,20 @@ public class StatePensionAudit {
         this.name = name;
     }
 
-    public Long getAnnualAmount() {
-        return annualAmount;
+    public Long getYearlyAmount() {
+        return yearlyAmount;
     }
 
-    public void setAnnualAmount(Long annualAmount) {
-        this.annualAmount = annualAmount;
+    public void setYearlyAmount(Long yearlyAmount) {
+        this.yearlyAmount = yearlyAmount;
+    }
+
+    public Integer getTakesEffectYear() {
+        return takesEffectYear;
+    }
+
+    public void setTakesEffectYear(Integer takesEffectYear) {
+        this.takesEffectYear = takesEffectYear;
     }
 
     public String getNotes() {
