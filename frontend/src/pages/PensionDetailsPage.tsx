@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Chart } from 'primereact/chart';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -34,9 +34,18 @@ export default function PensionDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const pensionId = Number(id);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Statement | null>(null);
+
+  useEffect(() => {
+    if ((location.state as { addStatement?: boolean } | null)?.addStatement) {
+      setEditing(null);
+      setDialogVisible(true);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   const { data: pension, isLoading: pensionLoading, isError: pensionError, error: pensionErr } = usePension(pensionId);
   const { data: statements, isLoading: stmtLoading, isError: stmtError, error: stmtErr } = useStatements(pensionId);

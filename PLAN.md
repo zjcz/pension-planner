@@ -132,24 +132,24 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: Aggregate overview and quick actions.
 
 ### Backend
-- [ ] `GET /api/v1/dashboard` aggregate endpoint (all scoped to user):
+- [x] `GET /api/v1/dashboard` aggregate endpoint (all scoped to user):
   - latest `planValue` per active pension (total current portfolio value);
   - total projected annual income (pensions latest `projectedAnnualAmount` + StatePension + OtherIncome);
   - StatePension & OtherIncome summaries;
   - retirement countdown from `UserSettings.retirementDate`.
-- [ ] `GET /api/v1/pensions` list (already needed for table; color swatch data included).
+- [x] `GET /api/v1/pensions` list (already needed for table; color swatch data included).
 
 ### Frontend
-- [ ] Summary `Card` widgets (4 cards: Portfolio Value, Projected Income vs `targetIncome`, State Pension & Other Income, Retirement Countdown).
-- [ ] Pensions `DataTable` with color swatch, row quick actions (Edit / Delete / Add Statement) opening the phase-3/4 modals.
-- [ ] Countdown widget rendering into `retirementDate`; progress indicator vs target income.
+- [x] Summary `Card` widgets (4 cards: Portfolio Value, Projected Income vs `targetIncome`, State Pension & Other Income, Retirement Countdown).
+- [x] Pensions `DataTable` with color swatch, row quick actions (Edit / Delete / Add Statement) opening the phase-3/4 modals.
+- [x] Countdown widget rendering into `retirementDate`; progress indicator vs target income.
 
 ### Tests
-- [ ] Backend: dashboard aggregation with empty data, single pension, multiple pensions + StatePension/OtherIncome; correct latest-statement pick.
+- [x] Backend: dashboard aggregation with empty data, single pension, multiple pensions + StatePension/OtherIncome; correct latest-statement pick.
 - [ ] FE smoke: dashboard renders cards and table.
 
 ### Acceptance
-- [ ] Dashboard shows correct totals and countdown; row actions wired to modals.
+- [x] Dashboard shows correct totals and countdown; row actions wired to modals.
 
 ---
 
