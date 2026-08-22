@@ -67,6 +67,19 @@ export interface StatePensionRequest {
   takesEffectYear: number;
 }
 
+export interface OtherIncome {
+  id: number;
+  name: string;
+  annualAmount: number;
+  notes: string | null;
+}
+
+export interface OtherIncomeRequest {
+  name: string;
+  annualAmount: number;
+  notes: string | null;
+}
+
 export interface DashboardDto {
   totalPortfolioValue: number;
   totalProjectedAnnualIncome: number;

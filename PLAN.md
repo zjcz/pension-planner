@@ -240,21 +240,22 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: CRUD on `OtherIncome` + chart page.
 
 ### Backend
-- [ ] `OtherIncomeService` CRUD (scoped by `userId`):
+- [x] `OtherIncomeService` CRUD (scoped by `userId`):
   - `GET /api/v1/other-income`, `POST`, `PUT /{id}`, `DELETE /{id}`.
-- [ ] Audit snapshots to `OtherIncomeAudit`.
-- [ ] Validation: `name`, `annualAmount` required.
+- [x] Audit snapshots to `OtherIncomeAudit`.
+- [x] Validation: `name`, `annualAmount` required.
 
 ### Frontend
-- [ ] `/other-income` page: `Toolbar` with Add button, `DataTable` (name, annualAmount, notes) with per-row Edit/Delete, plus bar chart of `annualAmount` vs `name` (dynamic colors).
-- [ ] Dialog for create/edit; React Query hooks; invalidate dashboard + analytics.
+- [x] `/other-income` page: `Toolbar` with Add button, `DataTable` (name, annualAmount, notes) with per-row Edit/Delete, plus bar chart of `annualAmount` vs `name` (dynamic colors).
+  - Consolidated onto Dashboard page: Other Income DataTable below Pensions table; "Add Income" button in toolbar; `/other-income` route removed.
+- [x] Dialog for create/edit; React Query hooks; invalidate dashboard + analytics.
 
 ### Tests
-- [ ] Backend: CRUD scoped to user; audit rows; validation.
+- [x] Backend: CRUD scoped to user; audit rows; validation.
 - [ ] FE smoke: table + chart render; add/edit/delete flows.
 
 ### Acceptance
-- [ ] Other income streams fully maintained; chart updates.
+- [x] Other income streams fully maintained; chart updates.
 
 ---
 
