@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import AnalyticsPage from './pages/AnalyticsPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import PensionDetailsPage from './pages/PensionDetailsPage';
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       { path: '/', element: <HomePage /> },
+      { path: '/analytics', element: <AnalyticsPage /> },
       { path: '/pensions/:id', element: <PensionDetailsPage /> },
     ],
   },

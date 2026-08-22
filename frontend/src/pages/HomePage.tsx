@@ -103,6 +103,7 @@ export default function HomePage() {
   const end = (
     <div className="flex align-items-center gap-3">
       <span className="text-secondary">Signed in as {user?.username}</span>
+      <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
       <Button label="Manage State Pension" icon="pi pi-briefcase" onClick={() => setSpDialogVisible(true)} />
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
     </div>

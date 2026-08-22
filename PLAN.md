@@ -264,26 +264,26 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: Projection + comparison charts per spec §4.2.5.
 
 ### Backend
-- [ ] `GET /api/v1/analytics` aggregate endpoint returning per-pension series and totals:
+- [x] `GET /api/v1/analytics` aggregate endpoint returning per-pension series and totals:
   - statements time series (planValue, amountPaidIn, yearlyCharges);
   - projections to `retirementDate` (extrapolate from latest planValue / projectedAnnualAmount trajectory);
   - StatePension + OtherIncome annual amounts;
   - `targetIncome` from settings.
-- [ ] Keep projection math server-side so frontend stays presentational.
+- [x] Keep projection math server-side so frontend stays presentational.
 
 ### Frontend
-- [ ] Retirement Runway / Growth Projection chart: multi-year forward projection with vertical line at `retirementDate` + milestone markers.
-- [ ] Growth vs. Cost grouped bar/line: per pension (planValue − amountPaidIn) vs cumulative yearlyCharges.
-- [ ] Combined Growth vs. Target stacked bar: per-pension segments (stored colors) + StatePension + OtherIncome, with horizontal `targetIncome` overlay line.
-- [ ] Historical Portfolio Trend: multi-line chart of individual + total planValue over past statement dates.
-- [ ] Consistent color mapping util shared with Dashboard/Pension views.
+- [x] Retirement Runway / Growth Projection chart: multi-year forward projection with vertical line at `retirementDate` + milestone markers.
+- [x] Growth vs. Cost grouped bar/line: per pension (planValue − amountPaidIn) vs cumulative yearlyCharges.
+- [x] Combined Growth vs. Target stacked bar: per-pension segments (stored colors) + StatePension + OtherIncome, with horizontal `targetIncome` overlay line.
+- [x] Historical Portfolio Trend: multi-line chart of individual + total planValue over past statement dates.
+- [x] Consistent color mapping util shared with Dashboard/Pension views.
 
 ### Tests
-- [ ] Backend: projection math unit tests (simple + compound growth, edge dates); aggregation across pensions.
+- [x] Backend: projection math unit tests (simple + compound growth, edge dates); aggregation across pensions.
 - [ ] FE smoke: all four charts render with fixture data.
 
 ### Acceptance
-- [ ] Charts reflect DB data and targets; reference line at retirement date.
+- [x] Charts reflect DB data and targets; reference line at retirement date.
 
 ---
 

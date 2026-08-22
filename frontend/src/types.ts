@@ -95,3 +95,19 @@ export interface DashboardDto {
   }[];
   retirementDate: string | null;
 }
+
+export interface AnalyticsDto {
+  today: string;
+  retirementDate: string | null;
+  targetIncome: number | null;
+  projections: { year: number; totalValue: number }[];
+  pensionGrowthCosts: { name: string; color: string | null; growthValue: number; cumulativeCharges: number }[];
+  pensionIncomeBreakdown: { name: string; color: string | null; projectedAnnualAmount: number }[];
+  statePensionAnnual: number;
+  otherIncomeBreakdown: { name: string; annualAmount: number }[];
+  pensionHistorySeries: {
+    name: string;
+    color: string | null;
+    dataPoints: { date: string; value: number }[];
+  }[];
+}
