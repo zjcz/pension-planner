@@ -1,6 +1,7 @@
 package com.pensionplanner.user;
 
 import com.pensionplanner.security.CurrentUserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,8 +26,8 @@ public class SettingsController {
     }
 
     @PutMapping
-    public SettingsDto update(@RequestBody SettingsDto dto) {
+    public SettingsDto update(@Valid @RequestBody SettingsRequest request) {
         return SettingsDto.from(settingsService.update(
-                currentUserService.currentUserId(), dto.targetIncome(), dto.retirementDate()));
+                currentUserService.currentUserId(), request.targetIncome(), request.retirementDate()));
     }
 }

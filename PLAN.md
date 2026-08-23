@@ -292,13 +292,13 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 **Goal**: Settings page + production hardening + docs.
 
 ### Backend
-- [ ] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
+- [x] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
 - [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
 - [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
 - [ ] GraalVM native-image note/optional profile (spec §1.2).
 
 ### Frontend
-- [ ] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
+- [x] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
 - [ ] Auth UX: show/hide registration based on server flag; session expiry handling; consistent empty/loading/error states across pages.
 
 ### Tests

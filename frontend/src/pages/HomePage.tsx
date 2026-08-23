@@ -13,6 +13,7 @@ import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { PensionFormDialog } from '../components/PensionFormDialog';
 import { OtherIncomeDialog } from '../components/OtherIncomeDialog';
+import { SettingsDialog } from '../components/SettingsDialog';
 import { StatePensionDialog } from '../components/StatePensionDialog';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOtherIncomeList, useCreateOtherIncome, useUpdateOtherIncome, useDeleteOtherIncome } from '../hooks/useOtherIncome';
@@ -48,6 +49,7 @@ export default function HomePage() {
   const [spDialogVisible, setSpDialogVisible] = useState(false);
   const [oiDialogVisible, setOiDialogVisible] = useState(false);
   const [oiEditing, setOiEditing] = useState<OtherIncome | null>(null);
+  const [settingsDialogVisible, setSettingsDialogVisible] = useState(false);
 
   const { data: pensions, isLoading, isError, error } = usePensions();
   const { data: dashboard } = useDashboard();
@@ -103,6 +105,7 @@ export default function HomePage() {
   const end = (
     <div className="flex align-items-center gap-3">
       <span className="text-secondary">Signed in as {user?.username}</span>
+      <Button label="Settings" icon="pi pi-cog" onClick={() => setSettingsDialogVisible(true)} />
       <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
       <Button label="Manage State Pension" icon="pi pi-briefcase" onClick={() => setSpDialogVisible(true)} />
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
@@ -298,6 +301,7 @@ export default function HomePage() {
         onSave={handleOiSave}
         loading={createOi.isPending || updateOi.isPending}
       />
+      <SettingsDialog visible={settingsDialogVisible} onHide={() => setSettingsDialogVisible(false)} />
       <ConfirmDialog />
     </div>
   );
