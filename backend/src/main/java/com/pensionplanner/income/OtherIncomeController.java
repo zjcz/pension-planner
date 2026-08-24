@@ -30,25 +30,33 @@ public class OtherIncomeController {
 
     @GetMapping
     public List<OtherIncomeDto> list() {
-        return otherIncomeService.listForUser(currentUserService.currentUserId()).stream()
-                .map(OtherIncomeDto::from)
+        Long userId = currentUserService.currentUserId();
+        List<OtherIncome> items = otherIncomeService.listForUser(userId);
+        return items.stream()
+                .map(oi -> OtherIncomeDto.from(oi, otherIncomeService.getTagsForOtherIncome(oi.getId())))
                 .toList();
     }
 
     @GetMapping("/{id}")
     public OtherIncomeDto get(@PathVariable Long id) {
-        return OtherIncomeDto.from(otherIncomeService.getForUser(currentUserService.currentUserId(), id));
+        Long userId = currentUserService.currentUserId();
+        OtherIncome oi = otherIncomeService.getForUser(userId, id);
+        return OtherIncomeDto.from(oi, otherIncomeService.getTagsForOtherIncome(id));
     }
 
     @PostMapping
     public ResponseEntity<OtherIncomeDto> create(@Valid @RequestBody OtherIncomeRequest request) {
-        OtherIncomeDto dto = OtherIncomeDto.from(otherIncomeService.create(currentUserService.currentUserId(), request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        Long userId = currentUserService.currentUserId();
+        OtherIncome oi = otherIncomeService.create(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(OtherIncomeDto.from(oi, otherIncomeService.getTagsForOtherIncome(oi.getId())));
     }
 
     @PutMapping("/{id}")
     public OtherIncomeDto update(@PathVariable Long id, @Valid @RequestBody OtherIncomeRequest request) {
-        return OtherIncomeDto.from(otherIncomeService.update(currentUserService.currentUserId(), id, request));
+        Long userId = currentUserService.currentUserId();
+        OtherIncome oi = otherIncomeService.update(userId, id, request);
+        return OtherIncomeDto.from(oi, otherIncomeService.getTagsForOtherIncome(id));
     }
 
     @DeleteMapping("/{id}")

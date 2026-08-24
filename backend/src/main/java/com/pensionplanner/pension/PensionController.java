@@ -1,6 +1,7 @@
 package com.pensionplanner.pension;
 
 import com.pensionplanner.security.CurrentUserService;
+import com.pensionplanner.tag.TagDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,25 +31,37 @@ public class PensionController {
 
     @GetMapping
     public List<PensionDto> list() {
-        return pensionService.listForUser(currentUserService.currentUserId()).stream()
-                .map(PensionDto::from)
+        Long userId = currentUserService.currentUserId();
+        List<Pension> pensions = pensionService.listForUser(userId);
+        List<Long> pensionIds = pensions.stream().map(Pension::getPensionId).toList();
+        java.util.Map<Long, List<TagDto>> tagsByPension = pensionService.getTagsForPensionsByPensionId(pensionIds);
+        return pensions.stream()
+                .map(p -> PensionDto.from(p, tagsByPension.getOrDefault(p.getPensionId(), List.of())))
                 .toList();
     }
 
     @GetMapping("/{pensionId}")
     public PensionDto get(@PathVariable Long pensionId) {
-        return PensionDto.from(pensionService.getForUser(currentUserService.currentUserId(), pensionId));
+        Long userId = currentUserService.currentUserId();
+        Pension pension = pensionService.getForUser(userId, pensionId);
+        List<TagDto> tags = pensionService.getTagsForPension(pensionId);
+        return PensionDto.from(pension, tags);
     }
 
     @PostMapping
     public ResponseEntity<PensionDto> create(@Valid @RequestBody PensionRequest request) {
-        PensionDto dto = PensionDto.from(pensionService.create(currentUserService.currentUserId(), request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        Long userId = currentUserService.currentUserId();
+        Pension pension = pensionService.create(userId, request);
+        List<TagDto> tags = pensionService.getTagsForPension(pension.getPensionId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(PensionDto.from(pension, tags));
     }
 
     @PutMapping("/{pensionId}")
     public PensionDto update(@PathVariable Long pensionId, @Valid @RequestBody PensionRequest request) {
-        return PensionDto.from(pensionService.update(currentUserService.currentUserId(), pensionId, request));
+        Long userId = currentUserService.currentUserId();
+        Pension pension = pensionService.update(userId, pensionId, request);
+        List<TagDto> tags = pensionService.getTagsForPension(pensionId);
+        return PensionDto.from(pension, tags);
     }
 
     @DeleteMapping("/{pensionId}")

@@ -310,6 +310,36 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ---
 
+# Phase 9 — Tags
+
+**Goal**: User-defined labels applied to Pensions and Other Income; multi-select in dialogs; displayed in DataTables.
+
+### Backend
+- [x] `Tag` entity: `id`, `userId`, `name` (user-scoped; many per user).
+- [x] `PensionTag` and `OtherIncomeTag` join tables via Flyway `V5__tags.sql`.
+- [x] `TagService`: list for user, create, delete (with cascade cleanup of join records).
+- [x] `TagController`: `GET /api/v1/tags`, `POST /api/v1/tags`, `DELETE /api/v1/tags/{id}`.
+- [x] `PensionService` / `OtherIncomeService`: `syncTags` on create/update; delete join records on entity delete.
+- [x] `PensionDto` / `OtherIncomeDto`: include `List<TagDto> tags`.
+- [x] `PensionRequest` / `OtherIncomeRequest`: include `List<Long> tagIds` (nullable).
+
+### Frontend
+- [x] `Tag` and `TagRequest` types; `tagsApi` (list, create, delete); `useTags`, `useCreateTag`, `useDeleteTag` hooks.
+- [x] `PensionFormDialog`: `MultiSelect` with chip display for tag selection; tags column in pensions DataTable.
+- [x] `OtherIncomeDialog`: `MultiSelect` with chip display for tag selection; tags column in other income DataTable.
+
+### Tests
+- [x] `TagServiceTest`: list scoped to user, create, delete with join cleanup, not-found / cross-user rejection.
+- [x] `TagControllerIntegrationTest`: create/list/delete flow, validation rejects blank name, per-user isolation.
+- [x] `PensionServiceTest` / `OtherIncomeServiceTest`: updated for new `tagIds` parameter.
+- [ ] FE smoke: tag creation and assignment in pension/income dialogs.
+
+### Acceptance
+- [x] Tags can be created and assigned to pensions and other income; tags display as chips in DataTables.
+- [x] Deleting a tag removes it from all pension/income assignments.
+
+---
+
 ## Cross-cutting considerations
 
 - **Audit review**: Provide read API for audit tables (e.g. `GET /api/v1/audit/{entity}/{id}`) or leave for a later "History" phase — confirm scope in Phase 1.

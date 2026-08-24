@@ -261,6 +261,11 @@ export default function HomePage() {
           <Column header="Status" body={statusBody} sortable />
           <Column header="Status Date" body={(row: Pension) => formatDate(row.statusDate)} sortable />
           <Column header="Colour" body={colorBody} />
+          <Column header="Tags" body={(row: Pension) =>
+            row.tags && row.tags.length > 0
+              ? <div className="flex flex-wrap gap-1">{row.tags.map((t) => <Tag key={t.id} value={t.name} severity="info" className="text-xs" />)}</div>
+              : <span className="text-secondary">—</span>
+          } />
           <Column header="Actions" body={actionsBody} style={{ width: '9rem' }} />
         </DataTable>
 
@@ -282,6 +287,11 @@ export default function HomePage() {
         >
           <Column field="name" header="Name" sortable />
           <Column header="Annual Amount" body={(row: OtherIncome) => formatCurrency(row.annualAmount)} sortable sortField="annualAmount" />
+          <Column header="Tags" body={(row: OtherIncome) =>
+            row.tags && row.tags.length > 0
+              ? <div className="flex flex-wrap gap-1">{row.tags.map((t) => <Tag key={t.id} value={t.name} severity="info" className="text-xs" />)}</div>
+              : <span className="text-secondary">—</span>
+          } />
           <Column field="notes" header="Notes" />
           <Column header="Actions" body={oiActionsBody} style={{ width: '7rem' }} />
         </DataTable>

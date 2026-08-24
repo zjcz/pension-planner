@@ -2,6 +2,8 @@ package com.pensionplanner.income;
 
 import com.pensionplanner.audit.AuditService;
 import com.pensionplanner.common.ApiException;
+import com.pensionplanner.tag.OtherIncomeTagRepository;
+import com.pensionplanner.tag.TagRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,15 +13,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class OtherIncomeServiceTest {
 
     private final OtherIncomeRepository otherIncomeRepository = mock(OtherIncomeRepository.class);
+    private final OtherIncomeTagRepository otherIncomeTagRepository = mock(OtherIncomeTagRepository.class);
+    private final TagRepository tagRepository = mock(TagRepository.class);
     private final AuditService auditService = mock(AuditService.class);
-    private final OtherIncomeService service = new OtherIncomeService(otherIncomeRepository, auditService);
+    private final OtherIncomeService service = new OtherIncomeService(
+            otherIncomeRepository, otherIncomeTagRepository, tagRepository, auditService);
 
     @Test
     void listForUserReturnsAll() {
@@ -56,7 +60,7 @@ class OtherIncomeServiceTest {
             return oi;
         });
 
-        OtherIncomeRequest request = new OtherIncomeRequest("Rental", 5000L, "Some notes");
+        OtherIncomeRequest request = new OtherIncomeRequest("Rental", 5000L, "Some notes", null);
         OtherIncome result = service.create(42L, request);
 
         assertThat(result.getUserId()).isEqualTo(42L);
@@ -75,7 +79,7 @@ class OtherIncomeServiceTest {
         when(otherIncomeRepository.findByIdAndUserId(1L, 42L)).thenReturn(Optional.of(existing));
         when(otherIncomeRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        OtherIncomeRequest request = new OtherIncomeRequest("New", 8000L, null);
+        OtherIncomeRequest request = new OtherIncomeRequest("New", 8000L, null, null);
         OtherIncome result = service.update(42L, 1L, request);
 
         verify(auditService).recordUpdate(existing);

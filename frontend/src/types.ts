@@ -15,6 +15,15 @@ export interface Settings {
 
 export type PensionStatus = 'ACTIVE' | 'CLOSED';
 
+export interface Tag {
+  id: number;
+  name: string;
+}
+
+export interface TagRequest {
+  name: string;
+}
+
 export interface Pension {
   pensionId: number;
   name: string;
@@ -23,6 +32,7 @@ export interface Pension {
   status: PensionStatus;
   statusDate: string | null;
   color: string | null;
+  tags: Tag[];
 }
 
 export interface PensionRequest {
@@ -31,6 +41,7 @@ export interface PensionRequest {
   notes: string | null;
   status: PensionStatus;
   color: string | null;
+  tagIds: number[] | null;
 }
 
 export interface Statement {
@@ -72,12 +83,14 @@ export interface OtherIncome {
   name: string;
   annualAmount: number;
   notes: string | null;
+  tags: Tag[];
 }
 
 export interface OtherIncomeRequest {
   name: string;
   annualAmount: number;
   notes: string | null;
+  tagIds: number[] | null;
 }
 
 export interface DashboardDto {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Dialog } from 'primereact/dialog';
@@ -6,7 +6,10 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Message } from 'primereact/message';
+import { MultiSelect } from 'primereact/multiselect';
+import { Toast } from 'primereact/toast';
 import { apiErrorMessage } from '../api/client';
+import { useCreateTag, useTags } from '../hooks/useTags';
 import type { Pension, PensionRequest, PensionStatus } from '../types';
 
 interface PensionFormDialogProps {
@@ -63,8 +66,14 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
   const [status, setStatus] = useState<PensionStatus | null>('ACTIVE');
   const [color, setColor] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [tagFilter, setTagFilter] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const toast = useRef<Toast>(null);
+
+  const { data: allTags = [] } = useTags();
+  const createTag = useCreateTag();
 
   useEffect(() => {
     if (visible) {
@@ -73,9 +82,29 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
       setStatus(pension?.status ?? 'ACTIVE');
       setColor(pension?.color ?? null);
       setNotes(pension?.notes ?? '');
+      setSelectedTagIds(pension?.tags?.map((t) => t.id) ?? []);
+      setTagFilter('');
       setError(null);
     }
   }, [visible, pension]);
+
+  const tagOptions = allTags.map((t) => ({ label: t.name, value: t.id }));
+
+  const tagFilterLower = tagFilter.trim().toLowerCase();
+  const exactMatch = tagFilterLower && allTags.some((t) => t.name.toLowerCase() === tagFilterLower);
+
+  const handleCreateTagFromFilter = async () => {
+    const tagName = tagFilter.trim();
+    if (!tagName) return;
+    try {
+      const created = await createTag.mutateAsync({ name: tagName });
+      setSelectedTagIds((prev) => [...prev, created.id]);
+      setTagFilter('');
+      toast.current?.show({ severity: 'success', summary: 'Tag Created', detail: `"${tagName}" added`, life: 2000 });
+    } catch (err) {
+      setError(apiErrorMessage(err));
+    }
+  };
 
   const submit = async () => {
     if (!name.trim()) {
@@ -99,6 +128,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
         notes: notes.trim() === '' ? null : notes,
         status,
         color,
+        tagIds: selectedTagIds.length > 0 ? selectedTagIds : null,
       });
     } catch (err) {
       setError(apiErrorMessage(err));
@@ -123,6 +153,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
       footer={footer}
       modal
     >
+      <Toast ref={toast} position="top-right" />
       <div className="flex flex-column gap-3">
         <div className="flex flex-column gap-2">
           <label htmlFor="pension-name">Name *</label>
@@ -192,6 +223,38 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
               ) : (
                 <span>{option?.label ?? 'None'}</span>
               )
+            }
+          />
+        </div>
+
+        <div className="flex flex-column gap-2">
+          <label htmlFor="pension-tags">Tags</label>
+          <MultiSelect
+            id="pension-tags"
+            value={selectedTagIds}
+            options={tagOptions}
+            onChange={(e) => setSelectedTagIds(e.value)}
+            placeholder="Select tags"
+            display="chip"
+            filter
+            onFilter={(e) => setTagFilter(e.filter)}
+            showClear
+            panelFooterTemplate={
+              tagFilter.trim() && !exactMatch ? (
+                <div className="flex justify-content-between align-items-center px-3 py-2 border-top-1 border-300">
+                  <span className="text-sm text-500">
+                    Create "<strong>{tagFilter.trim()}</strong>" as new tag
+                  </span>
+                  <Button
+                    icon="pi pi-plus"
+                    rounded
+                    text
+                    size="small"
+                    onClick={handleCreateTagFromFilter}
+                    aria-label="Create tag"
+                  />
+                </div>
+              ) : null
             }
           />
         </div>

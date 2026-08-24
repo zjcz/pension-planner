@@ -2,6 +2,8 @@ package com.pensionplanner.pension;
 
 import com.pensionplanner.audit.AuditService;
 import com.pensionplanner.common.ApiException;
+import com.pensionplanner.tag.PensionTagRepository;
+import com.pensionplanner.tag.TagRepository;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -20,8 +22,11 @@ class PensionServiceTest {
 
     private final PensionRepository pensionRepository = mock(PensionRepository.class);
     private final PensionStatementRepository statementRepository = mock(PensionStatementRepository.class);
+    private final PensionTagRepository pensionTagRepository = mock(PensionTagRepository.class);
+    private final TagRepository tagRepository = mock(TagRepository.class);
     private final AuditService auditService = mock(AuditService.class);
-    private final PensionService service = new PensionService(pensionRepository, statementRepository, auditService);
+    private final PensionService service = new PensionService(
+            pensionRepository, statementRepository, pensionTagRepository, tagRepository, auditService);
 
     @Test
     void createSetsUserIdAndAudits() {
@@ -32,7 +37,7 @@ class PensionServiceTest {
         });
 
         PensionRequest request = new PensionRequest("My Pension", LocalDate.of(2045, 1, 1),
-                PensionStatus.ACTIVE, null, "#123456");
+                PensionStatus.ACTIVE, null, "#123456", null);
 
         Pension result = service.create(42L, request);
 
@@ -48,7 +53,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         Pension result = service.create(1L, new PensionRequest("P", LocalDate.of(2045, 1, 1),
-                PensionStatus.CLOSED, null, null));
+                PensionStatus.CLOSED, null, null, null));
 
         assertThat(result.getStatusDate()).isEqualTo(LocalDate.now());
         assertThat(result.getStatus()).isEqualTo(PensionStatus.CLOSED);
@@ -78,7 +83,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         PensionRequest request = new PensionRequest("New Name", LocalDate.of(2046, 6, 30),
-                PensionStatus.ACTIVE, "some notes", "#abcdef");
+                PensionStatus.ACTIVE, "some notes", "#abcdef", null);
 
         Pension result = service.update(42L, 5L, request);
 
@@ -99,7 +104,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         PensionRequest request = new PensionRequest("P", LocalDate.of(2046, 6, 30),
-                PensionStatus.CLOSED, null, null);
+                PensionStatus.CLOSED, null, null, null);
 
         Pension result = service.update(42L, 5L, request);
 
@@ -112,7 +117,7 @@ class PensionServiceTest {
         when(pensionRepository.findByPensionIdAndUserId(5L, 42L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(42L, 5L,
-                new PensionRequest("N", LocalDate.of(2046, 6, 30), PensionStatus.ACTIVE, null, null)))
+                new PensionRequest("N", LocalDate.of(2046, 6, 30), PensionStatus.ACTIVE, null, null, null)))
                 .isInstanceOf(ApiException.class);
         verify(pensionRepository, never()).save(any());
     }

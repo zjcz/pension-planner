@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PensionRequest(
         @NotBlank(message = "name is required")
@@ -21,6 +22,8 @@ public record PensionRequest(
         String notes,
 
         @Pattern(regexp = "^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$", message = "color must be a hex value like #RRGGBB")
-        String color
+        String color,
+
+        List<Long> tagIds
 ) {
 }

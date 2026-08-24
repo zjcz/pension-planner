@@ -1,6 +1,9 @@
 package com.pensionplanner.pension;
 
+import com.pensionplanner.tag.TagDto;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public record PensionDto(
         Long pensionId,
@@ -9,10 +12,11 @@ public record PensionDto(
         String notes,
         PensionStatus status,
         LocalDate statusDate,
-        String color
+        String color,
+        List<TagDto> tags
 ) {
 
-    public static PensionDto from(Pension pension) {
+    public static PensionDto from(Pension pension, List<TagDto> tags) {
         return new PensionDto(
                 pension.getPensionId(),
                 pension.getName(),
@@ -20,6 +24,7 @@ public record PensionDto(
                 pension.getNotes(),
                 pension.getStatus(),
                 pension.getStatusDate(),
-                pension.getColor());
+                pension.getColor(),
+                tags);
     }
 }
