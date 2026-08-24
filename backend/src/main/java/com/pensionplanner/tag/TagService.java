@@ -36,6 +36,17 @@ public class TagService {
     }
 
     @Transactional
+    public Tag rename(Long userId, Long tagId, String newName) {
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Tag not found"));
+        if (!tag.getUserId().equals(userId)) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Tag not found");
+        }
+        tag.setName(newName.trim());
+        return tagRepository.save(tag);
+    }
+
+    @Transactional
     public void delete(Long userId, Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Tag not found"));

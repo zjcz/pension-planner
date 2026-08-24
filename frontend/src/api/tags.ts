@@ -7,5 +7,8 @@ export const tagsApi = {
   create: (request: TagRequest) =>
     http.post<Tag>('/tags', request).then((response) => response.data),
 
+  update: (tagId: number, request: TagRequest) =>
+    http.put<Tag>(`/tags/${tagId}`, request).then((response) => response.data),
+
   delete: (tagId: number) => http.delete<void>(`/tags/${tagId}`),
 };

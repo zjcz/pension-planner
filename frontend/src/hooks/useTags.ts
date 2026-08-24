@@ -19,12 +19,27 @@ export function useCreateTag() {
   });
 }
 
+export function useUpdateTag() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tagId, request }: { tagId: number; request: TagRequest }) =>
+      tagsApi.update(tagId, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: ['pensions'] });
+      queryClient.invalidateQueries({ queryKey: ['otherIncome'] });
+    },
+  });
+}
+
 export function useDeleteTag() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (tagId: number) => tagsApi.delete(tagId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: ['pensions'] });
+      queryClient.invalidateQueries({ queryKey: ['otherIncome'] });
     },
   });
 }
