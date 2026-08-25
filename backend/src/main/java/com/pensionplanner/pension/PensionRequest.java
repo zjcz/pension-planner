@@ -24,6 +24,15 @@ public record PensionRequest(
         @Pattern(regexp = "^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$", message = "color must be a hex value like #RRGGBB")
         String color,
 
-        List<Long> tagIds
+        List<Long> tagIds,
+
+        @Size(max = 100, message = "providerName must be at most 100 characters")
+        String providerName,
+
+        @Size(max = 100, message = "policyNumber must be at most 100 characters")
+        String policyNumber,
+
+        @Size(max = 100, message = "workplaceName must be at most 100 characters")
+        String workplaceName
 ) {
 }

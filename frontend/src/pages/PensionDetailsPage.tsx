@@ -208,6 +208,18 @@ export default function PensionDetailsPage() {
                 )}
               </div>
             </div>
+            <div className="col-12 md:col-6 lg:col-3">
+              <div className="text-sm text-secondary mb-1">Provider</div>
+              <div className="font-medium">{pension?.providerName || '—'}</div>
+            </div>
+            <div className="col-12 md:col-6 lg:col-3">
+              <div className="text-sm text-secondary mb-1">Policy Number</div>
+              <div className="font-medium">{pension?.policyNumber || '—'}</div>
+            </div>
+            <div className="col-12 md:col-6 lg:col-3">
+              <div className="text-sm text-secondary mb-1">Workplace</div>
+              <div className="font-medium">{pension?.workplaceName || '—'}</div>
+            </div>
             <div className="col-12 md:col-6 lg:col-9">
               <div className="text-sm text-secondary mb-1">Notes</div>
               <div className="font-medium">{pension?.notes || '—'}</div>

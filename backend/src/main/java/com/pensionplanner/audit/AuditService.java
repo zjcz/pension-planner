@@ -103,6 +103,9 @@ public class AuditService {
         audit.setStatus(pension.getStatus() == null ? null : pension.getStatus().name());
         audit.setStatusDate(pension.getStatusDate());
         audit.setColor(pension.getColor());
+        audit.setProviderName(pension.getProviderName());
+        audit.setPolicyNumber(pension.getPolicyNumber());
+        audit.setWorkplaceName(pension.getWorkplaceName());
         pensionAuditRepository.save(audit);
     }
 

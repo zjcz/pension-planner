@@ -42,6 +42,15 @@ public class Pension {
     @Column(name = "color")
     private String color;
 
+    @Column(name = "providerName", length = 100)
+    private String providerName;
+
+    @Column(name = "policyNumber", length = 100)
+    private String policyNumber;
+
+    @Column(name = "workplaceName", length = 100)
+    private String workplaceName;
+
     public Long getPensionId() {
         return pensionId;
     }
@@ -104,5 +113,29 @@ public class Pension {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    public String getPolicyNumber() {
+        return policyNumber;
+    }
+
+    public void setPolicyNumber(String policyNumber) {
+        this.policyNumber = policyNumber;
+    }
+
+    public String getWorkplaceName() {
+        return workplaceName;
+    }
+
+    public void setWorkplaceName(String workplaceName) {
+        this.workplaceName = workplaceName;
     }
 }

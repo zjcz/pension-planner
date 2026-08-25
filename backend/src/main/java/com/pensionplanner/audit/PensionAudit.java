@@ -49,6 +49,15 @@ public class PensionAudit {
     @Column(name = "color")
     private String color;
 
+    @Column(name = "providerName")
+    private String providerName;
+
+    @Column(name = "policyNumber")
+    private String policyNumber;
+
+    @Column(name = "workplaceName")
+    private String workplaceName;
+
     public Long getAuditId() {
         return auditId;
     }
@@ -135,5 +144,29 @@ public class PensionAudit {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    public String getPolicyNumber() {
+        return policyNumber;
+    }
+
+    public void setPolicyNumber(String policyNumber) {
+        this.policyNumber = policyNumber;
+    }
+
+    public String getWorkplaceName() {
+        return workplaceName;
+    }
+
+    public void setWorkplaceName(String workplaceName) {
+        this.workplaceName = workplaceName;
     }
 }

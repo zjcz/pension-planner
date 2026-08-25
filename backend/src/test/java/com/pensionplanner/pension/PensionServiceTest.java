@@ -37,7 +37,7 @@ class PensionServiceTest {
         });
 
         PensionRequest request = new PensionRequest("My Pension", LocalDate.of(2045, 1, 1),
-                PensionStatus.ACTIVE, null, "#123456", null);
+                PensionStatus.ACTIVE, null, "#123456", null, null, null, null);
 
         Pension result = service.create(42L, request);
 
@@ -53,7 +53,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         Pension result = service.create(1L, new PensionRequest("P", LocalDate.of(2045, 1, 1),
-                PensionStatus.CLOSED, null, null, null));
+                PensionStatus.CLOSED, null, null, null, null, null, null));
 
         assertThat(result.getStatusDate()).isEqualTo(LocalDate.now());
         assertThat(result.getStatus()).isEqualTo(PensionStatus.CLOSED);
@@ -83,7 +83,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         PensionRequest request = new PensionRequest("New Name", LocalDate.of(2046, 6, 30),
-                PensionStatus.ACTIVE, "some notes", "#abcdef", null);
+                PensionStatus.ACTIVE, "some notes", "#abcdef", null, null, null, null);
 
         Pension result = service.update(42L, 5L, request);
 
@@ -104,7 +104,7 @@ class PensionServiceTest {
         when(pensionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         PensionRequest request = new PensionRequest("P", LocalDate.of(2046, 6, 30),
-                PensionStatus.CLOSED, null, null, null);
+                PensionStatus.CLOSED, null, null, null, null, null, null);
 
         Pension result = service.update(42L, 5L, request);
 
@@ -117,7 +117,7 @@ class PensionServiceTest {
         when(pensionRepository.findByPensionIdAndUserId(5L, 42L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(42L, 5L,
-                new PensionRequest("N", LocalDate.of(2046, 6, 30), PensionStatus.ACTIVE, null, null, null)))
+                new PensionRequest("N", LocalDate.of(2046, 6, 30), PensionStatus.ACTIVE, null, null, null, null, null, null)))
                 .isInstanceOf(ApiException.class);
         verify(pensionRepository, never()).save(any());
     }

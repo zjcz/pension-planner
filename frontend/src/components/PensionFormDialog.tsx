@@ -68,6 +68,9 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
   const [notes, setNotes] = useState('');
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [tagFilter, setTagFilter] = useState('');
+  const [providerName, setProviderName] = useState('');
+  const [policyNumber, setPolicyNumber] = useState('');
+  const [workplaceName, setWorkplaceName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
@@ -83,6 +86,9 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
       setColor(pension?.color ?? null);
       setNotes(pension?.notes ?? '');
       setSelectedTagIds(pension?.tags?.map((t) => t.id) ?? []);
+      setProviderName(pension?.providerName ?? '');
+      setPolicyNumber(pension?.policyNumber ?? '');
+      setWorkplaceName(pension?.workplaceName ?? '');
       setTagFilter('');
       setError(null);
     }
@@ -129,6 +135,9 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
         status,
         color,
         tagIds: selectedTagIds.length > 0 ? selectedTagIds : null,
+        providerName: providerName.trim() || null,
+        policyNumber: policyNumber.trim() || null,
+        workplaceName: workplaceName.trim() || null,
       });
     } catch (err) {
       setError(apiErrorMessage(err));
@@ -224,6 +233,37 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
                 <span>{option?.label ?? 'None'}</span>
               )
             }
+          />
+        </div>
+
+        <div className="flex flex-column gap-2">
+          <label htmlFor="pension-providerName">Provider Name</label>
+          <InputText
+            id="pension-providerName"
+            value={providerName}
+            onChange={(e) => setProviderName(e.target.value)}
+            maxLength={100}
+            placeholder="e.g. Aviva, Scottish Widows"
+          />
+        </div>
+
+        <div className="flex flex-column gap-2">
+          <label htmlFor="pension-policyNumber">Policy Number</label>
+          <InputText
+            id="pension-policyNumber"
+            value={policyNumber}
+            onChange={(e) => setPolicyNumber(e.target.value)}
+            maxLength={100}
+          />
+        </div>
+
+        <div className="flex flex-column gap-2">
+          <label htmlFor="pension-workplaceName">Workplace Name</label>
+          <InputText
+            id="pension-workplaceName"
+            value={workplaceName}
+            onChange={(e) => setWorkplaceName(e.target.value)}
+            maxLength={100}
           />
         </div>
 

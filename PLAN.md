@@ -182,6 +182,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - **Audit on update**: `recordUpdate` is invoked before mutating, per the Phase 1 convention ("prior to mutation" wording), so UPDATE snapshots capture the pre-change row.
 - **Malformed bodies**: `HttpMessageNotReadableException` (e.g. unknown `status` enum) now returns `400` instead of `500`.
 - **PensionStatement entity**: aligned with the V2 domain refactor (no `userId` column; DB-level `ON DELETE CASCADE` FKs).
+- **Pension provider fields** (V6): added `providerName`, `policyNumber`, `workplaceName` (all nullable `TEXT(100)`) to `pension` and `pension_audit` tables. Stored in entity, DTO, request, audit snapshot, and displayed on the Pension Details overview panel and edit dialog.
 
 ---
 

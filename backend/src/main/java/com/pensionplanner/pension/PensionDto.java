@@ -13,7 +13,10 @@ public record PensionDto(
         PensionStatus status,
         LocalDate statusDate,
         String color,
-        List<TagDto> tags
+        List<TagDto> tags,
+        String providerName,
+        String policyNumber,
+        String workplaceName
 ) {
 
     public static PensionDto from(Pension pension, List<TagDto> tags) {
@@ -25,6 +28,9 @@ public record PensionDto(
                 pension.getStatus(),
                 pension.getStatusDate(),
                 pension.getColor(),
-                tags);
+                tags,
+                pension.getProviderName(),
+                pension.getPolicyNumber(),
+                pension.getWorkplaceName());
     }
 }

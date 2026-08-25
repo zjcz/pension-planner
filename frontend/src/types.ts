@@ -33,6 +33,9 @@ export interface Pension {
   statusDate: string | null;
   color: string | null;
   tags: Tag[];
+  providerName: string | null;
+  policyNumber: string | null;
+  workplaceName: string | null;
 }
 
 export interface PensionRequest {
@@ -42,6 +45,9 @@ export interface PensionRequest {
   status: PensionStatus;
   color: string | null;
   tagIds: number[] | null;
+  providerName: string | null;
+  policyNumber: string | null;
+  workplaceName: string | null;
 }
 
 export interface Statement {

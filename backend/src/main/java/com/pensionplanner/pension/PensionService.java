@@ -148,6 +148,9 @@ public class PensionService {
         pension.setMaturityDate(request.maturityDate());
         pension.setNotes(request.notes());
         pension.setColor(request.color());
+        pension.setProviderName(request.providerName());
+        pension.setPolicyNumber(request.policyNumber());
+        pension.setWorkplaceName(request.workplaceName());
         if (pension.getPensionId() == null) {
             pension.setStatusDate(LocalDate.now());
         } else if (pension.getStatus() != request.status()) {
