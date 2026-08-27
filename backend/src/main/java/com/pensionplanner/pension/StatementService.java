@@ -43,14 +43,14 @@ public class StatementService {
         statement.setPensionId(pensionId);
         apply(statement, request);
         PensionStatement saved = statementRepository.save(statement);
-        auditService.recordCreate(saved);
+        auditService.recordCreate(userId, saved);
         return saved;
     }
 
     @Transactional
     public PensionStatement update(Long userId, Long pensionId, Long statementId, StatementRequest request) {
         PensionStatement statement = getForUser(userId, pensionId, statementId);
-        auditService.recordUpdate(statement);
+        auditService.recordUpdate(userId, statement);
         apply(statement, request);
         return statementRepository.save(statement);
     }
@@ -58,7 +58,7 @@ public class StatementService {
     @Transactional
     public void delete(Long userId, Long pensionId, Long statementId) {
         PensionStatement statement = getForUser(userId, pensionId, statementId);
-        auditService.recordDelete(statement);
+        auditService.recordDelete(userId, statement);
         statementRepository.delete(statement);
     }
 

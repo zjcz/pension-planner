@@ -28,6 +28,7 @@ public class SettingsController {
     @PutMapping
     public SettingsDto update(@Valid @RequestBody SettingsRequest request) {
         return SettingsDto.from(settingsService.update(
-                currentUserService.currentUserId(), request.targetIncome(), request.retirementDate()));
+                currentUserService.currentUserId(), request.targetIncome(), request.retirementDate(),
+                request.auditEnabled()));
     }
 }

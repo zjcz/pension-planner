@@ -27,6 +27,9 @@ public class UserSettings {
     @Column(name = "retirementDate")
     private LocalDate retirementDate;
 
+    @Column(name = "auditEnabled", nullable = false)
+    private boolean auditEnabled = true;
+
     public Long getId() {
         return id;
     }
@@ -57,5 +60,13 @@ public class UserSettings {
 
     public void setRetirementDate(LocalDate retirementDate) {
         this.retirementDate = retirementDate;
+    }
+
+    public boolean isAuditEnabled() {
+        return auditEnabled;
+    }
+
+    public void setAuditEnabled(boolean auditEnabled) {
+        this.auditEnabled = auditEnabled;
     }
 }

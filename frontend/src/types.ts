@@ -11,6 +11,7 @@ export interface AuthConfig {
 export interface Settings {
   targetIncome: number | null;
   retirementDate: string | null;
+  auditEnabled: boolean;
 }
 
 export type PensionStatus = 'ACTIVE' | 'CLOSED';

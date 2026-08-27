@@ -72,7 +72,7 @@ public class PensionService {
         Pension pension = getForUser(userId, pensionId);
         List<PensionStatement> statements = statementRepository.findByPensionIdOrderByStatementDateAsc(pensionId);
         for (PensionStatement statement : statements) {
-            auditService.recordDelete(statement);
+            auditService.recordDelete(userId, statement);
         }
         if (!statements.isEmpty()) {
             statementRepository.deleteAll(statements);

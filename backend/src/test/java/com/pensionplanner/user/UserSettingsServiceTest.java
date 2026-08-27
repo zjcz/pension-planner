@@ -43,7 +43,7 @@ class UserSettingsServiceTest {
         when(repository.findByUserId(2L)).thenReturn(Optional.empty());
         when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserSettings updated = service.update(2L, 5000000L, LocalDate.of(2045, 1, 1));
+        UserSettings updated = service.update(2L, 5000000L, LocalDate.of(2045, 1, 1), true);
 
         assertThat(updated.getUserId()).isEqualTo(2L);
         assertThat(updated.getTargetIncome()).isEqualTo(5000000L);
@@ -60,10 +60,20 @@ class UserSettingsServiceTest {
         when(repository.findByUserId(3L)).thenReturn(Optional.of(settings));
         when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserSettings updated = service.update(3L, 6000000L, null);
+        UserSettings updated = service.update(3L, 6000000L, null, true);
 
         assertThat(updated.getId()).isEqualTo(10L);
         assertThat(updated.getTargetIncome()).isEqualTo(6000000L);
         assertThat(updated.getRetirementDate()).isNull();
+    }
+
+    @Test
+    void updateStoresAuditEnabled() {
+        when(repository.findByUserId(5L)).thenReturn(Optional.empty());
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserSettings result = service.update(5L, null, null, false);
+
+        assertThat(result.isAuditEnabled()).isFalse();
     }
 }

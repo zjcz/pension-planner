@@ -1,0 +1,1 @@
+ALTER TABLE user_settings ADD COLUMN auditEnabled BOOLEAN NOT NULL DEFAULT 1;

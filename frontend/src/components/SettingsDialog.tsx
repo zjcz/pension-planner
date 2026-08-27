@@ -4,6 +4,7 @@ import { Calendar } from 'primereact/calendar';
 import { Dialog } from 'primereact/dialog';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
+import { InputSwitch } from 'primereact/inputswitch';
 import { Message } from 'primereact/message';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { apiErrorMessage } from '../api/client';
@@ -26,6 +27,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
 
   const [targetIncome, setTargetIncome] = useState<number | null>(null);
   const [retirementDate, setRetirementDate] = useState<Date | null>(null);
+  const [auditEnabled, setAuditEnabled] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
 
   const [newTagName, setNewTagName] = useState('');
@@ -37,6 +39,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
     if (visible && settings) {
       setTargetIncome(settings.targetIncome);
       setRetirementDate(settings.retirementDate ? new Date(`${settings.retirementDate}T00:00:00`) : null);
+      setAuditEnabled(settings.auditEnabled);
       setFormError(null);
       setNewTagName('');
       setEditingTagId(null);
@@ -55,7 +58,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
       ? `${retirementDate.getFullYear()}-${String(retirementDate.getMonth() + 1).padStart(2, '0')}-${String(retirementDate.getDate()).padStart(2, '0')}`
       : null;
     try {
-      await updateSettings.mutateAsync({ targetIncome, retirementDate: dateStr });
+      await updateSettings.mutateAsync({ targetIncome, retirementDate: dateStr, auditEnabled });
       onHide();
     } catch (err) {
       setFormError(apiErrorMessage(err));
@@ -150,6 +153,18 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
               className="w-full"
             />
             <small className="text-secondary">When you plan to retire.</small>
+          </div>
+
+          <div className="flex align-items-center gap-3">
+            <InputSwitch
+              id="auditEnabled"
+              checked={auditEnabled}
+              onChange={(e) => setAuditEnabled(e.value)}
+            />
+            <div>
+              <label htmlFor="auditEnabled" className="font-medium cursor-pointer">Enable audit logging</label>
+              <small className="block text-secondary">Record changes to an audit trail for pensions and income.</small>
+            </div>
           </div>
 
           {formError && <Message severity="error" text={formError} />}

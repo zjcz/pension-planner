@@ -294,16 +294,19 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Backend
 - [x] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
+- [x] **Audit toggle** (`V7__audit_enabled_setting.sql`): `auditEnabled` boolean on `user_settings` (default `true`). `AuditService` checks setting before writing to any audit table; for `PensionStatement` the parent `Pension` is resolved to look up the user. When disabled, audit writes are skipped silently.
 - [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
 - [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
 - [ ] GraalVM native-image note/optional profile (spec §1.2).
 
 ### Frontend
 - [x] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
+- [x] **Audit toggle** in `SettingsDialog`: `InputSwitch` for `auditEnabled`, persisted via PUT /settings.
 - [ ] Auth UX: show/hide registration based on server flag; session expiry handling; consistent empty/loading/error states across pages.
 
 ### Tests
-- [ ] Backend: settings update; env-flag behavior end-to-end; health endpoint.
+- [x] `AuditServiceTest`: existing snapshot tests enable audit; new `pensionSkipsAuditWhenDisabled` and `statementSkipsAuditWhenDisabled` tests verify no writes when setting is off.
+- [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted.
 - [ ] FE smoke: settings save reflects on dashboard.
 
 ### Acceptance

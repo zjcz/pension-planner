@@ -136,7 +136,7 @@ class PensionServiceTest {
 
         service.delete(42L, 5L);
 
-        verify(auditService).recordDelete(statement);
+        verify(auditService).recordDelete(42L, statement);
         verify(statementRepository).deleteAll(List.of(statement));
         verify(auditService).recordDelete(pension);
         verify(pensionRepository).delete(pension);

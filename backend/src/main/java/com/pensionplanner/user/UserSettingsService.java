@@ -23,7 +23,7 @@ public class UserSettingsService {
     }
 
     @Transactional
-    public UserSettings update(Long userId, Long targetIncome, LocalDate retirementDate) {
+    public UserSettings update(Long userId, Long targetIncome, LocalDate retirementDate, boolean auditEnabled) {
         UserSettings settings = repository.findByUserId(userId).orElseGet(() -> {
             UserSettings created = new UserSettings();
             created.setUserId(userId);
@@ -31,6 +31,7 @@ public class UserSettingsService {
         });
         settings.setTargetIncome(targetIncome);
         settings.setRetirementDate(retirementDate);
+        settings.setAuditEnabled(auditEnabled);
         return repository.save(settings);
     }
 }

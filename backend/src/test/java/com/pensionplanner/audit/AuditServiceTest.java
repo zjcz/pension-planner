@@ -5,24 +5,45 @@ import com.pensionplanner.income.StatePension;
 import com.pensionplanner.pension.Pension;
 import com.pensionplanner.pension.PensionStatus;
 import com.pensionplanner.pension.PensionStatement;
+import com.pensionplanner.user.UserSettings;
+import com.pensionplanner.user.UserSettingsRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 class AuditServiceTest {
 
     private final PensionAuditRepository pensionAuditRepository = mock(PensionAuditRepository.class);
     private final PensionStatementAuditRepository statementAuditRepository = mock(PensionStatementAuditRepository.class);
     private final StatePensionAuditRepository statePensionAuditRepository = mock(StatePensionAuditRepository.class);
     private final OtherIncomeAuditRepository otherIncomeAuditRepository = mock(OtherIncomeAuditRepository.class);
+    private final UserSettingsRepository userSettingsRepository = mock(UserSettingsRepository.class);
 
     private final AuditService auditService = new AuditService(
-            pensionAuditRepository, statementAuditRepository, statePensionAuditRepository, otherIncomeAuditRepository);
+            pensionAuditRepository, statementAuditRepository, statePensionAuditRepository,
+            otherIncomeAuditRepository, userSettingsRepository);
+
+    private void enableAudit(Long userId) {
+        UserSettings settings = new UserSettings();
+        settings.setUserId(userId);
+        settings.setAuditEnabled(true);
+        when(userSettingsRepository.findByUserId(userId)).thenReturn(Optional.of(settings));
+    }
+
+    private void disableAudit(Long userId) {
+        UserSettings settings = new UserSettings();
+        settings.setUserId(userId);
+        settings.setAuditEnabled(false);
+        when(userSettingsRepository.findByUserId(userId)).thenReturn(Optional.of(settings));
+    }
 
     @Test
     void pensionSnapshotOnCreate() {
@@ -36,6 +57,7 @@ class AuditServiceTest {
         pension.setStatusDate(LocalDate.of(2026, 1, 1));
         pension.setColor("#FF5733");
 
+        enableAudit(3L);
         auditService.recordCreate(pension);
 
         ArgumentCaptor<PensionAudit> captor = ArgumentCaptor.forClass(PensionAudit.class);
@@ -62,6 +84,7 @@ class AuditServiceTest {
         pension.setMaturityDate(LocalDate.of(2030, 1, 1));
         pension.setStatus(PensionStatus.CLOSED);
 
+        enableAudit(1L);
         auditService.recordUpdate(pension);
         auditService.recordDelete(pension);
 
@@ -86,7 +109,9 @@ class AuditServiceTest {
         statement.setAmountPaidIn(4000000L);
         statement.setStatementNotes("March statement");
 
-        auditService.recordCreate(statement);
+        enableAudit(5L);
+
+        auditService.recordCreate(5L, statement);
 
         ArgumentCaptor<PensionStatementAudit> captor = ArgumentCaptor.forClass(PensionStatementAudit.class);
         verify(statementAuditRepository).save(captor.capture());
@@ -110,6 +135,7 @@ class AuditServiceTest {
         statePension.setTakesEffectYear(2026);
         statePension.setNotes("forecast");
 
+        enableAudit(3L);
         auditService.recordUpdate(statePension);
 
         ArgumentCaptor<StatePensionAudit> captor = ArgumentCaptor.forClass(StatePensionAudit.class);
@@ -130,6 +156,7 @@ class AuditServiceTest {
         otherIncome.setName("Rental");
         otherIncome.setAnnualAmount(600000L);
 
+        enableAudit(3L);
         auditService.recordDelete(otherIncome);
 
         ArgumentCaptor<OtherIncomeAudit> captor = ArgumentCaptor.forClass(OtherIncomeAudit.class);
@@ -138,5 +165,36 @@ class AuditServiceTest {
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_DELETE);
         assertThat(audit.getName()).isEqualTo("Rental");
         assertThat(audit.getAnnualAmount()).isEqualTo(600000L);
+    }
+
+    @Test
+    void pensionSkipsAuditWhenDisabled() {
+        Pension pension = new Pension();
+        pension.setPensionId(1L);
+        pension.setUserId(4L);
+        pension.setName("X");
+        pension.setMaturityDate(LocalDate.of(2030, 1, 1));
+        pension.setStatus(PensionStatus.ACTIVE);
+
+        disableAudit(4L);
+        auditService.recordCreate(pension);
+
+        verify(pensionAuditRepository, never()).save(any());
+    }
+
+    @Test
+    void statementSkipsAuditWhenDisabled() {
+        PensionStatement statement = new PensionStatement();
+        statement.setStatementId(1L);
+        statement.setPensionId(10L);
+        statement.setStatementDate(LocalDate.of(2026, 1, 1));
+        statement.setPlanValue(100L);
+        statement.setProjectedAnnualAmount(50L);
+
+        disableAudit(4L);
+
+        auditService.recordDelete(4L, statement);
+
+        verify(statementAuditRepository, never()).save(any());
     }
 }

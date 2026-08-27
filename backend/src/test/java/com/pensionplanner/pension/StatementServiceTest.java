@@ -59,7 +59,7 @@ class StatementServiceTest {
         assertThat(result.getStatementDate()).isEqualTo(LocalDate.of(2026, 1, 1));
         assertThat(result.getPlanValue()).isEqualTo(100000L);
         assertThat(result.getStatementNotes()).isEqualTo("Initial");
-        verify(auditService).recordCreate(result);
+        verify(auditService).recordCreate(42L, result);
     }
 
     @Test
@@ -96,7 +96,7 @@ class StatementServiceTest {
 
         PensionStatement result = service.update(42L, 1L, 10L, request);
 
-        verify(auditService).recordUpdate(existing);
+        verify(auditService).recordUpdate(42L, existing);
         assertThat(result.getPlanValue()).isEqualTo(150000L);
     }
 
@@ -111,7 +111,7 @@ class StatementServiceTest {
 
         service.delete(42L, 1L, 10L);
 
-        verify(auditService).recordDelete(statement);
+        verify(auditService).recordDelete(42L, statement);
         verify(statementRepository).delete(statement);
     }
 

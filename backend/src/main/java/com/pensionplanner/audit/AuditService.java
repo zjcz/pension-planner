@@ -4,6 +4,7 @@ import com.pensionplanner.income.OtherIncome;
 import com.pensionplanner.income.StatePension;
 import com.pensionplanner.pension.Pension;
 import com.pensionplanner.pension.PensionStatement;
+import com.pensionplanner.user.UserSettingsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,75 +21,96 @@ public class AuditService {
     private final PensionStatementAuditRepository pensionStatementAuditRepository;
     private final StatePensionAuditRepository statePensionAuditRepository;
     private final OtherIncomeAuditRepository otherIncomeAuditRepository;
+    private final UserSettingsRepository userSettingsRepository;
 
     public AuditService(PensionAuditRepository pensionAuditRepository,
                         PensionStatementAuditRepository pensionStatementAuditRepository,
                         StatePensionAuditRepository statePensionAuditRepository,
-                        OtherIncomeAuditRepository otherIncomeAuditRepository) {
+                        OtherIncomeAuditRepository otherIncomeAuditRepository,
+                        UserSettingsRepository userSettingsRepository) {
         this.pensionAuditRepository = pensionAuditRepository;
         this.pensionStatementAuditRepository = pensionStatementAuditRepository;
         this.statePensionAuditRepository = statePensionAuditRepository;
         this.otherIncomeAuditRepository = otherIncomeAuditRepository;
+        this.userSettingsRepository = userSettingsRepository;
     }
 
     @Transactional
     public void recordCreate(Pension pension) {
+        if (!isAuditEnabled(pension.getUserId())) return;
         record(pension, ACTION_CREATE);
     }
 
     @Transactional
     public void recordUpdate(Pension pension) {
+        if (!isAuditEnabled(pension.getUserId())) return;
         record(pension, ACTION_UPDATE);
     }
 
     @Transactional
     public void recordDelete(Pension pension) {
+        if (!isAuditEnabled(pension.getUserId())) return;
         record(pension, ACTION_DELETE);
     }
 
     @Transactional
-    public void recordCreate(PensionStatement statement) {
+    public void recordCreate(Long userId, PensionStatement statement) {
+        if (!isAuditEnabled(userId)) return;
         record(statement, ACTION_CREATE);
     }
 
     @Transactional
-    public void recordUpdate(PensionStatement statement) {
+    public void recordUpdate(Long userId, PensionStatement statement) {
+        if (!isAuditEnabled(userId)) return;
         record(statement, ACTION_UPDATE);
     }
 
     @Transactional
-    public void recordDelete(PensionStatement statement) {
+    public void recordDelete(Long userId, PensionStatement statement) {
+        if (!isAuditEnabled(userId)) return;
         record(statement, ACTION_DELETE);
     }
 
     @Transactional
     public void recordCreate(StatePension statePension) {
+        if (!isAuditEnabled(statePension.getUserId())) return;
         record(statePension, ACTION_CREATE);
     }
 
     @Transactional
     public void recordUpdate(StatePension statePension) {
+        if (!isAuditEnabled(statePension.getUserId())) return;
         record(statePension, ACTION_UPDATE);
     }
 
     @Transactional
     public void recordDelete(StatePension statePension) {
+        if (!isAuditEnabled(statePension.getUserId())) return;
         record(statePension, ACTION_DELETE);
     }
 
     @Transactional
     public void recordCreate(OtherIncome otherIncome) {
+        if (!isAuditEnabled(otherIncome.getUserId())) return;
         record(otherIncome, ACTION_CREATE);
     }
 
     @Transactional
     public void recordUpdate(OtherIncome otherIncome) {
+        if (!isAuditEnabled(otherIncome.getUserId())) return;
         record(otherIncome, ACTION_UPDATE);
     }
 
     @Transactional
     public void recordDelete(OtherIncome otherIncome) {
+        if (!isAuditEnabled(otherIncome.getUserId())) return;
         record(otherIncome, ACTION_DELETE);
+    }
+
+    private boolean isAuditEnabled(Long userId) {
+        return userSettingsRepository.findByUserId(userId)
+                .map(settings -> settings.isAuditEnabled())
+                .orElse(true);
     }
 
     private void record(Pension pension, String action) {
