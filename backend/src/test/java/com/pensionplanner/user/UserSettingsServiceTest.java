@@ -1,5 +1,6 @@
 package com.pensionplanner.user;
 
+import com.pensionplanner.audit.AuditService;
 import com.pensionplanner.common.ApiException;
 import org.junit.jupiter.api.Test;
 
@@ -10,13 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class UserSettingsServiceTest {
 
     private final UserSettingsRepository repository = mock(UserSettingsRepository.class);
-    private final UserSettingsService service = new UserSettingsService(repository);
+    private final AuditService auditService = mock(AuditService.class);
+    private final UserSettingsService service = new UserSettingsService(repository, auditService);
 
     @Test
     void getForUserThrowsNotFoundWhenMissing() {
@@ -75,5 +78,45 @@ class UserSettingsServiceTest {
         UserSettings result = service.update(5L, null, null, false);
 
         assertThat(result.isAuditEnabled()).isFalse();
+    }
+
+    @Test
+    void disablingAuditPurgesAuditData() {
+        UserSettings settings = new UserSettings();
+        settings.setUserId(3L);
+        settings.setAuditEnabled(true);
+        when(repository.findByUserId(3L)).thenReturn(Optional.of(settings));
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.update(3L, null, null, false);
+
+        verify(auditService).purgeUserAudits(3L);
+    }
+
+    @Test
+    void enablingAuditSnapshotsRecords() {
+        UserSettings settings = new UserSettings();
+        settings.setUserId(3L);
+        settings.setAuditEnabled(false);
+        when(repository.findByUserId(3L)).thenReturn(Optional.of(settings));
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.update(3L, null, null, true);
+
+        verify(auditService).snapshotUserAudits(3L);
+    }
+
+    @Test
+    void noAuditActionWhenSettingUnchanged() {
+        UserSettings settings = new UserSettings();
+        settings.setUserId(3L);
+        settings.setAuditEnabled(true);
+        when(repository.findByUserId(3L)).thenReturn(Optional.of(settings));
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.update(3L, null, null, true);
+
+        verify(auditService, never()).purgeUserAudits(any());
+        verify(auditService, never()).snapshotUserAudits(any());
     }
 }

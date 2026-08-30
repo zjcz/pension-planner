@@ -7,4 +7,6 @@ import java.util.List;
 public interface PensionAuditRepository extends JpaRepository<PensionAudit, Long> {
 
     List<PensionAudit> findByPensionIdOrderByAuditTimestampDesc(Long pensionId);
+
+    void deleteByUserId(Long userId);
 }

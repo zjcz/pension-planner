@@ -296,19 +296,20 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
 - [x] **Audit toggle** (`V7__audit_enabled_setting.sql`): `auditEnabled` boolean on `user_settings` (default `true`). `AuditService` receives `userId` as an argument at each record call site and checks the setting before writing to any audit table. When disabled, audit writes are skipped silently.
 - [x] **Audit viewing** (`AuditController` + `AuditReadService` + DTOs): read-only `GET /api/v1/audit/pensions/{id}`, `/statements/{id}`, `/other-income/{id}`. Rows are filtered by userId (ownership checked via the owning entity) and returned in `auditTimestamp` **descending** order. Repositories: `findByPensionIdOrderByAuditTimestampDesc`, `findByStatementIdOrderByAuditTimestampDesc`, `findByIdOrderByAuditTimestampDesc`.
+- [x] **Audit purge/snapshot on toggle** (`AuditService.purgeUserAudits` / `snapshotUserAudits`): `UserSettingsService.update()` reacts to a transition in `auditEnabled`. Turning it **off** deletes every audit row for the user (`deleteByUserId` on pension/state-pension/other-income audits + `deleteByPensionIdIn` for statement audits, scoped via the user's current pensions). Turning it **on** writes a `CREATE` snapshot for each of the user's existing pensions (plus their statements), state pension and other income. Repos gained `deleteBy*` derived methods; `AuditService` now also depends on the four entity repositories.
 - [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
 - [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
 - [ ] GraalVM native-image note/optional profile (spec §1.2).
 
 ### Frontend
 - [x] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
-- [x] **Audit toggle** in `SettingsDialog`: `InputSwitch` for `auditEnabled`, persisted via PUT /settings.
+- [x] **Audit toggle** in `SettingsDialog`: `InputSwitch` for `auditEnabled`, persisted via PUT /settings. Turning the switch **off** shows a `confirmDialog` warning that all audit history will be permanently deleted; only on confirmation does it save (the backend then purges the data).
 - [x] **Audit History**: `AuditDialog` (read-only table: Action tag, Timestamp, entity columns). History (`pi-history`) button on the Actions column of the Pensions, Other Income, and Statement tables — hidden when `auditEnabled` is false. Data fetched via `auditApi`/`useAudit` hooks.
 - [ ] Auth UX: show/hide registration based on server flag; session expiry handling; consistent empty/loading/error states across pages.
 
 ### Tests
-- [x] `AuditServiceTest`: existing snapshot tests enable audit; new `pensionSkipsAuditWhenDisabled` and `statementSkipsAuditWhenDisabled` tests verify no writes when setting is off.
-- [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted.
+- [x] `AuditServiceTest`: existing snapshot tests enable audit; `pensionSkipsAuditWhenDisabled` and `statementSkipsAuditWhenDisabled` verify no writes when setting off; `purgeDeletesAllAuditTypesForUser`, `purgeHandlesUserWithNoPensions`, `snapshotWritesCreateForEveryRecord` cover the toggle transitions.
+- [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted; `disablingAuditPurgesAuditData`, `enablingAuditSnapshotsRecords`, `noAuditActionWhenSettingUnchanged` verify the transition behaviour.
 - [x] `AuditControllerIntegrationTest`: verifies each audit endpoint returns rows in `auditTimestamp` descending order (UPDATE before CREATE), that UPDATE snapshots capture the pre-change value, and that a user cannot read another user's audit records (404).
 - [ ] FE smoke: settings save reflects on dashboard.
 

@@ -1,14 +1,19 @@
 package com.pensionplanner.audit;
 
 import com.pensionplanner.income.OtherIncome;
+import com.pensionplanner.income.OtherIncomeRepository;
 import com.pensionplanner.income.StatePension;
+import com.pensionplanner.income.StatePensionRepository;
 import com.pensionplanner.pension.Pension;
+import com.pensionplanner.pension.PensionRepository;
 import com.pensionplanner.pension.PensionStatement;
+import com.pensionplanner.pension.PensionStatementRepository;
 import com.pensionplanner.user.UserSettingsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class AuditService {
@@ -22,17 +27,29 @@ public class AuditService {
     private final StatePensionAuditRepository statePensionAuditRepository;
     private final OtherIncomeAuditRepository otherIncomeAuditRepository;
     private final UserSettingsRepository userSettingsRepository;
+    private final PensionRepository pensionRepository;
+    private final PensionStatementRepository pensionStatementRepository;
+    private final StatePensionRepository statePensionRepository;
+    private final OtherIncomeRepository otherIncomeRepository;
 
     public AuditService(PensionAuditRepository pensionAuditRepository,
                         PensionStatementAuditRepository pensionStatementAuditRepository,
                         StatePensionAuditRepository statePensionAuditRepository,
                         OtherIncomeAuditRepository otherIncomeAuditRepository,
-                        UserSettingsRepository userSettingsRepository) {
+                        UserSettingsRepository userSettingsRepository,
+                        PensionRepository pensionRepository,
+                        PensionStatementRepository pensionStatementRepository,
+                        StatePensionRepository statePensionRepository,
+                        OtherIncomeRepository otherIncomeRepository) {
         this.pensionAuditRepository = pensionAuditRepository;
         this.pensionStatementAuditRepository = pensionStatementAuditRepository;
         this.statePensionAuditRepository = statePensionAuditRepository;
         this.otherIncomeAuditRepository = otherIncomeAuditRepository;
         this.userSettingsRepository = userSettingsRepository;
+        this.pensionRepository = pensionRepository;
+        this.pensionStatementRepository = pensionStatementRepository;
+        this.statePensionRepository = statePensionRepository;
+        this.otherIncomeRepository = otherIncomeRepository;
     }
 
     @Transactional
@@ -105,6 +122,34 @@ public class AuditService {
     public void recordDelete(OtherIncome otherIncome) {
         if (!isAuditEnabled(otherIncome.getUserId())) return;
         record(otherIncome, ACTION_DELETE);
+    }
+
+    @Transactional
+    public void purgeUserAudits(Long userId) {
+        List<Long> pensionIds = pensionRepository.findByUserIdOrderByNameAsc(userId).stream()
+                .map(Pension::getPensionId)
+                .toList();
+        pensionAuditRepository.deleteByUserId(userId);
+        if (!pensionIds.isEmpty()) {
+            pensionStatementAuditRepository.deleteByPensionIdIn(pensionIds);
+        }
+        statePensionAuditRepository.deleteByUserId(userId);
+        otherIncomeAuditRepository.deleteByUserId(userId);
+    }
+
+    @Transactional
+    public void snapshotUserAudits(Long userId) {
+        for (Pension pension : pensionRepository.findByUserIdOrderByNameAsc(userId)) {
+            record(pension, ACTION_CREATE);
+            for (PensionStatement statement : pensionStatementRepository.findByPensionIdOrderByStatementDateAsc(pension.getPensionId())) {
+                record(statement, ACTION_CREATE);
+            }
+        }
+        statePensionRepository.findByUserId(userId)
+                .ifPresent(statePension -> record(statePension, ACTION_CREATE));
+        for (OtherIncome otherIncome : otherIncomeRepository.findByUserIdOrderByNameAsc(userId)) {
+            record(otherIncome, ACTION_CREATE);
+        }
     }
 
     private boolean isAuditEnabled(Long userId) {

@@ -1,5 +1,6 @@
 package com.pensionplanner.user;
 
+import com.pensionplanner.audit.AuditService;
 import com.pensionplanner.common.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,11 @@ import java.time.LocalDate;
 public class UserSettingsService {
 
     private final UserSettingsRepository repository;
+    private final AuditService auditService;
 
-    public UserSettingsService(UserSettingsRepository repository) {
+    public UserSettingsService(UserSettingsRepository repository, AuditService auditService) {
         this.repository = repository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -29,9 +32,16 @@ public class UserSettingsService {
             created.setUserId(userId);
             return created;
         });
+        boolean wasEnabled = settings.isAuditEnabled();
         settings.setTargetIncome(targetIncome);
         settings.setRetirementDate(retirementDate);
         settings.setAuditEnabled(auditEnabled);
-        return repository.save(settings);
+        UserSettings saved = repository.save(settings);
+        if (wasEnabled && !auditEnabled) {
+            auditService.purgeUserAudits(userId);
+        } else if (!wasEnabled && auditEnabled) {
+            auditService.snapshotUserAudits(userId);
+        }
+        return saved;
     }
 }

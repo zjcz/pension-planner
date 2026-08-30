@@ -53,6 +53,22 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
       setFormError('Target income must be ≥ 0');
       return;
     }
+    if (settings && settings.auditEnabled && !auditEnabled) {
+      confirmDialog({
+        message: 'Turning off audit logging will permanently delete all your existing audit history for pensions, pension statements and income. This cannot be undone.',
+        header: 'Disable audit logging?',
+        acceptLabel: 'Disable and delete',
+        rejectLabel: 'Cancel',
+        acceptClassName: 'p-button-danger',
+        reject: () => setAuditEnabled(true),
+        accept: () => saveSettings(),
+      });
+      return;
+    }
+    saveSettings();
+  };
+
+  const saveSettings = async () => {
     setFormError(null);
     const dateStr = retirementDate
       ? `${retirementDate.getFullYear()}-${String(retirementDate.getMonth() + 1).padStart(2, '0')}-${String(retirementDate.getDate()).padStart(2, '0')}`
