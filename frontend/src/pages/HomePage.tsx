@@ -11,14 +11,17 @@ import { Tag } from 'primereact/tag';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { AuditDialog, formatLong } from '../components/AuditDialog';
 import { PensionFormDialog } from '../components/PensionFormDialog';
 import { OtherIncomeDialog } from '../components/OtherIncomeDialog';
 import { SettingsDialog } from '../components/SettingsDialog';
 import { StatePensionDialog } from '../components/StatePensionDialog';
+import { usePensionAudit, useOtherIncomeAudit } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOtherIncomeList, useCreateOtherIncome, useUpdateOtherIncome, useDeleteOtherIncome } from '../hooks/useOtherIncome';
 import { useCreatePension, useDeletePension, usePensions, useUpdatePension } from '../hooks/usePensions';
-import type { Pension, PensionRequest, OtherIncome, OtherIncomeRequest } from '../types';
+import { useSettings } from '../hooks/useSettings';
+import type { Pension, PensionRequest, OtherIncome, OtherIncomeRequest, OtherIncomeAuditEntry } from '../types';
 
 function formatCurrency(value: number | null | undefined): string {
   if (value == null) return '£0';
@@ -50,6 +53,15 @@ export default function HomePage() {
   const [oiDialogVisible, setOiDialogVisible] = useState(false);
   const [oiEditing, setOiEditing] = useState<OtherIncome | null>(null);
   const [settingsDialogVisible, setSettingsDialogVisible] = useState(false);
+  const [pensionAuditTarget, setPensionAuditTarget] = useState<Pension | null>(null);
+  const [oiAuditTarget, setOiAuditTarget] = useState<OtherIncome | null>(null);
+
+  const { data: settings } = useSettings();
+  const auditEnabled = settings?.auditEnabled ?? false;
+  const { data: pensionAuditRecords = [], isLoading: pensionAuditLoading, isError: pensionAuditError, error: pensionAuditErr } =
+    usePensionAudit(pensionAuditTarget?.pensionId ?? -1, pensionAuditTarget != null && auditEnabled);
+  const { data: oiAuditRecords = [], isLoading: oiAuditLoading, isError: oiAuditError, error: oiAuditErr } =
+    useOtherIncomeAudit(oiAuditTarget?.id ?? -1, oiAuditTarget != null && auditEnabled);
 
   const { data: pensions, isLoading, isError, error } = usePensions();
   const { data: dashboard } = useDashboard();
@@ -132,6 +144,9 @@ export default function HomePage() {
       <Button icon="pi pi-pencil" severity="secondary" rounded text aria-label="Edit" onClick={() => openEdit(row)} />
       <Button icon="pi pi-trash" severity="danger" rounded text aria-label="Delete" onClick={() => handleDelete(row)} />
       <Button icon="pi pi-plus" severity="success" rounded text aria-label="Add Statement" onClick={() => navigate(`/pensions/${row.pensionId}`, { state: { addStatement: true } })} />
+      {auditEnabled && (
+        <Button icon="pi pi-history" severity="info" rounded text aria-label="Audit History" onClick={() => setPensionAuditTarget(row)} />
+      )}
     </div>
   );
 
@@ -158,6 +173,9 @@ export default function HomePage() {
     <div className="flex gap-2">
       <Button icon="pi pi-pencil" severity="secondary" rounded text aria-label="Edit" onClick={() => { setOiEditing(row); setOiDialogVisible(true); }} />
       <Button icon="pi pi-trash" severity="danger" rounded text aria-label="Delete" onClick={() => handleOiDelete(row)} />
+      {auditEnabled && (
+        <Button icon="pi pi-history" severity="info" rounded text aria-label="Audit History" onClick={() => setOiAuditTarget(row)} />
+      )}
     </div>
   );
 
@@ -266,7 +284,7 @@ export default function HomePage() {
               ? <div className="flex flex-wrap gap-1">{row.tags.map((t) => <Tag key={t.id} value={t.name} severity="info" className="text-xs" />)}</div>
               : <span className="text-secondary">—</span>
           } />
-          <Column header="Actions" body={actionsBody} style={{ width: '9rem' }} />
+          <Column header="Actions" body={actionsBody} style={{ width: '12rem' }} />
         </DataTable>
 
         {/* Other Income Table */}
@@ -293,7 +311,7 @@ export default function HomePage() {
               : <span className="text-secondary">—</span>
           } />
           <Column field="notes" header="Notes" />
-          <Column header="Actions" body={oiActionsBody} style={{ width: '7rem' }} />
+          <Column header="Actions" body={oiActionsBody} style={{ width: '10rem' }} />
         </DataTable>
       </div>
 
@@ -312,6 +330,41 @@ export default function HomePage() {
         loading={createOi.isPending || updateOi.isPending}
       />
       <SettingsDialog visible={settingsDialogVisible} onHide={() => setSettingsDialogVisible(false)} />
+      <AuditDialog
+        visible={pensionAuditTarget != null}
+        title={pensionAuditTarget?.name ?? 'Pension'}
+        records={pensionAuditRecords}
+        loading={pensionAuditLoading}
+        error={pensionAuditError ? pensionAuditErr : null}
+        onHide={() => setPensionAuditTarget(null)}
+        columns={[
+          { field: 'name', header: 'Name' },
+          { field: 'maturityDate', header: 'Maturity' },
+          { field: 'status', header: 'Status' },
+          { field: 'statusDate', header: 'Status Date' },
+          { field: 'providerName', header: 'Provider' },
+          { field: 'policyNumber', header: 'Policy No.' },
+          { field: 'workplaceName', header: 'Workplace' },
+          { field: 'color', header: 'Colour' },
+          { field: 'notes', header: 'Notes' },
+        ]}
+      />
+      <AuditDialog
+        visible={oiAuditTarget != null}
+        title={oiAuditTarget?.name ?? 'Other Income'}
+        records={oiAuditRecords}
+        loading={oiAuditLoading}
+        error={oiAuditError ? oiAuditErr : null}
+        onHide={() => setOiAuditTarget(null)}
+        columns={[
+          { field: 'name', header: 'Name' },
+          {
+            header: 'Annual Amount',
+            body: (row) => formatLong((row as OtherIncomeAuditEntry).annualAmount),
+          },
+          { field: 'notes', header: 'Notes' },
+        ]}
+      />
       <ConfirmDialog />
     </div>
   );

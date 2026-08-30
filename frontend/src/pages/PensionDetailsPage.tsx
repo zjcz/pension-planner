@@ -10,15 +10,18 @@ import { Tag } from 'primereact/tag';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { AuditDialog, formatLong } from '../components/AuditDialog';
 import { StatementFormDialog } from '../components/StatementFormDialog';
+import { useStatementAudit } from '../hooks/useAudit';
 import { usePension } from '../hooks/usePensions';
+import { useSettings } from '../hooks/useSettings';
 import {
   useStatements,
   useCreateStatement,
   useUpdateStatement,
   useDeleteStatement,
 } from '../hooks/useStatements';
-import type { Statement, StatementRequest } from '../types';
+import type { Statement, StatementRequest, PensionStatementAuditEntry } from '../types';
 
 function formatCurrency(value: number | null): string {
   if (value == null) return '—';
@@ -52,6 +55,12 @@ export default function PensionDetailsPage() {
   const createStatement = useCreateStatement(pensionId);
   const updateStatement = useUpdateStatement(pensionId);
   const deleteStatement = useDeleteStatement(pensionId);
+
+  const { data: settings } = useSettings();
+  const auditEnabled = settings?.auditEnabled ?? false;
+  const [statementAuditTarget, setStatementAuditTarget] = useState<Statement | null>(null);
+  const { data: statementAuditRecords = [], isLoading: statementAuditLoading, isError: statementAuditError, error: statementAuditErr } =
+    useStatementAudit(statementAuditTarget?.statementId ?? -1, statementAuditTarget != null && auditEnabled);
 
   const onLogout = async () => {
     await logout();
@@ -148,6 +157,9 @@ export default function PensionDetailsPage() {
     <div className="flex gap-2">
       <Button icon="pi pi-pencil" severity="secondary" rounded text aria-label="Edit" onClick={() => openEdit(row)} />
       <Button icon="pi pi-trash" severity="danger" rounded text aria-label="Delete" onClick={() => handleDelete(row)} />
+      {auditEnabled && (
+        <Button icon="pi pi-history" severity="info" rounded text aria-label="Audit History" onClick={() => setStatementAuditTarget(row)} />
+      )}
     </div>
   );
 
@@ -255,7 +267,7 @@ export default function PensionDetailsPage() {
             <Column header="Transfer Value" body={(row: Statement) => formatCurrency(row.transferValue)} sortable sortField="transferValue" />
             <Column header="Paid In" body={(row: Statement) => formatCurrency(row.amountPaidIn)} sortable sortField="amountPaidIn" />
             <Column field="statementNotes" header="Notes" />
-            <Column header="Actions" body={actionsBody} style={{ width: '7rem' }} />
+            <Column header="Actions" body={actionsBody} style={{ width: '10rem' }} />
           </DataTable>
         </div>
       </div>
@@ -265,6 +277,38 @@ export default function PensionDetailsPage() {
         statement={editing}
         onHide={() => setDialogVisible(false)}
         onSave={handleSave}
+      />
+      <AuditDialog
+        visible={statementAuditTarget != null}
+        title="Statement"
+        records={statementAuditRecords}
+        loading={statementAuditLoading}
+        error={statementAuditError ? statementAuditErr : null}
+        onHide={() => setStatementAuditTarget(null)}
+        columns={[
+          { field: 'statementDate', header: 'Statement Date' },
+          {
+            header: 'Plan Value',
+            body: (row) => formatLong((row as PensionStatementAuditEntry).planValue),
+          },
+          {
+            header: 'Projected Annual',
+            body: (row) => formatLong((row as PensionStatementAuditEntry).projectedAnnualAmount),
+          },
+          {
+            header: 'Charges',
+            body: (row) => formatLong((row as PensionStatementAuditEntry).yearlyCharges),
+          },
+          {
+            header: 'Transfer Value',
+            body: (row) => formatLong((row as PensionStatementAuditEntry).transferValue),
+          },
+          {
+            header: 'Paid In',
+            body: (row) => formatLong((row as PensionStatementAuditEntry).amountPaidIn),
+          },
+          { field: 'statementNotes', header: 'Notes' },
+        ]}
       />
       <ConfirmDialog />
     </div>

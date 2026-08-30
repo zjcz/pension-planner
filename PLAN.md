@@ -294,7 +294,8 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Backend
 - [x] `GET/PUT /api/v1/settings` finalized (already scaffolded in Phase 1); expose `ALLOW_REGISTRATION` flag for UI.
-- [x] **Audit toggle** (`V7__audit_enabled_setting.sql`): `auditEnabled` boolean on `user_settings` (default `true`). `AuditService` checks setting before writing to any audit table; for `PensionStatement` the parent `Pension` is resolved to look up the user. When disabled, audit writes are skipped silently.
+- [x] **Audit toggle** (`V7__audit_enabled_setting.sql`): `auditEnabled` boolean on `user_settings` (default `true`). `AuditService` receives `userId` as an argument at each record call site and checks the setting before writing to any audit table. When disabled, audit writes are skipped silently.
+- [x] **Audit viewing** (`AuditController` + `AuditReadService` + DTOs): read-only `GET /api/v1/audit/pensions/{id}`, `/statements/{id}`, `/other-income/{id}`. Rows are filtered by userId (ownership checked via the owning entity) and returned in `auditTimestamp` **descending** order. Repositories: `findByPensionIdOrderByAuditTimestampDesc`, `findByStatementIdOrderByAuditTimestampDesc`, `findByIdOrderByAuditTimestampDesc`.
 - [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
 - [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
 - [ ] GraalVM native-image note/optional profile (spec §1.2).
@@ -302,11 +303,13 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 ### Frontend
 - [x] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
 - [x] **Audit toggle** in `SettingsDialog`: `InputSwitch` for `auditEnabled`, persisted via PUT /settings.
+- [x] **Audit History**: `AuditDialog` (read-only table: Action tag, Timestamp, entity columns). History (`pi-history`) button on the Actions column of the Pensions, Other Income, and Statement tables — hidden when `auditEnabled` is false. Data fetched via `auditApi`/`useAudit` hooks.
 - [ ] Auth UX: show/hide registration based on server flag; session expiry handling; consistent empty/loading/error states across pages.
 
 ### Tests
 - [x] `AuditServiceTest`: existing snapshot tests enable audit; new `pensionSkipsAuditWhenDisabled` and `statementSkipsAuditWhenDisabled` tests verify no writes when setting is off.
 - [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted.
+- [x] `AuditControllerIntegrationTest`: verifies each audit endpoint returns rows in `auditTimestamp` descending order (UPDATE before CREATE), that UPDATE snapshots capture the pre-change value, and that a user cannot read another user's audit records (404).
 - [ ] FE smoke: settings save reflects on dashboard.
 
 ### Acceptance

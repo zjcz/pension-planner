@@ -131,3 +131,42 @@ export interface AnalyticsDto {
     dataPoints: { date: string; value: number }[];
   }[];
 }
+
+export interface PensionAuditEntry {
+  auditId: number;
+  action: string;
+  auditTimestamp: string;
+  name: string;
+  maturityDate: string | null;
+  notes: string | null;
+  status: string | null;
+  statusDate: string | null;
+  color: string | null;
+  providerName: string | null;
+  policyNumber: string | null;
+  workplaceName: string | null;
+}
+
+export interface PensionStatementAuditEntry {
+  auditId: number;
+  action: string;
+  auditTimestamp: string;
+  statementId: number;
+  statementDate: string;
+  planValue: number;
+  projectedAnnualAmount: number;
+  yearlyCharges: number | null;
+  transferValue: number | null;
+  amountPaidIn: number | null;
+  statementNotes: string | null;
+}
+
+export interface OtherIncomeAuditEntry {
+  auditId: number;
+  action: string;
+  auditTimestamp: string;
+  id: number;
+  name: string;
+  annualAmount: number;
+  notes: string | null;
+}
