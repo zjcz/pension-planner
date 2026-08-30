@@ -1,5 +1,6 @@
 server:
   port: ${SERVER_PORT:8080}
+  shutdown: graceful
 
 spring:
   application:
@@ -23,6 +24,6 @@ spring:
 pension-planner:
   jwt:
     secret: ${JWT_SECRET:}
-    ttl-seconds: 604800
+    ttl-seconds: ${JWT_TTL_SECONDS:604800}
     cookie-name: pp_jwt
     secure: ${COOKIE_SECURE:false}

@@ -77,7 +77,18 @@ npm run dev
 docker compose up --build
 ```
 
-This serves the full app (backend + built frontend) at `http://localhost:8080`. The SQLite database is persisted in `./data` (mounted as a volume).
+This builds a single image (multi-stage: frontend build → backend jar → runtime) and serves the full app at `http://localhost:8080`. The SQLite database is persisted in `./data` (bind-mounted as a volume).
+
+To build the image without Compose:
+
+```bash
+docker build -t pension-planner:latest .
+docker run --rm -p 8080:8080 -v "$PWD/data:/data" pension-planner:latest
+```
+
+The container runs as a non-root user (uid 1000, matching the standard first host user) so the bind-mounted `./data` directory is writable. If your host user has a different uid, either chown `./data` to uid 1000 or switch Compose to a named volume.
+
+The image exposes a `/health` endpoint (returns `{"status":"UP"}` when the app and its SQLite database are ready); `docker compose` uses it as the container healthcheck.
 
 ## Configuration
 
@@ -89,7 +100,12 @@ All settings are environment variables (defaults shown):
 | `SERVER_PORT`        | `8080`          | Backend HTTP port                                                   |
 | `ALLOW_REGISTRATION` | `true` (Docker) | When `false`, the register endpoint is disabled                     |
 | `JWT_SECRET`         | *(empty)*       | Secret used to sign JWTs. Leave empty for a random per-run secret   |
+| `JWT_TTL_SECONDS`    | `604800`        | JWT lifetime in seconds (defaults to 1 week)                        |
 | `COOKIE_SECURE`      | `false`         | Set `true` to send the JWT cookie only over HTTPS                   |
+
+## GraalVM native image
+
+Spring Boot supports Ahead-of-Time (AOT) native compilation via the `spring-boot-maven-plugin` `native` profile (`./mvnw -Pnative`). This is an **optional profile** kept out of the default build — the Docker image uses the regular JVM fat JAR. Note that a Spring Data + Hibernate + Flyway (SQLite) stack needs extra runtime hints (Hibernate proxy/bytecode enhancement, Flyway and JDBC reflection) to compile to a working native image; see the Spring Boot "GraalVM Native Image" reference for the configuration required before enabling the profile.
 
 ## Debugging
 

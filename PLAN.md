@@ -297,9 +297,9 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] **Audit toggle** (`V7__audit_enabled_setting.sql`): `auditEnabled` boolean on `user_settings` (default `true`). `AuditService` receives `userId` as an argument at each record call site and checks the setting before writing to any audit table. When disabled, audit writes are skipped silently.
 - [x] **Audit viewing** (`AuditController` + `AuditReadService` + DTOs): read-only `GET /api/v1/audit/pensions/{id}`, `/statements/{id}`, `/other-income/{id}`. Rows are filtered by userId (ownership checked via the owning entity) and returned in `auditTimestamp` **descending** order. Repositories: `findByPensionIdOrderByAuditTimestampDesc`, `findByStatementIdOrderByAuditTimestampDesc`, `findByIdOrderByAuditTimestampDesc`.
 - [x] **Audit purge/snapshot on toggle** (`AuditService.purgeUserAudits` / `snapshotUserAudits`): `UserSettingsService.update()` reacts to a transition in `auditEnabled`. Turning it **off** deletes every audit row for the user (`deleteByUserId` on pension/state-pension/other-income audits + `deleteByPensionIdIn` for statement audits, scoped via the user's current pensions). Turning it **on** writes a `CREATE` snapshot for each of the user's existing pensions (plus their statements), state pension and other income. Repos gained `deleteBy*` derived methods; `AuditService` now also depends on the four entity repositories.
-- [ ] Ops hardening: rate limiting on auth endpoints, security headers, CORS restriction, graceful shutdown, health endpoint.
-- [ ] Docker multi-stage build (`frontend` build → `backend` jar) producing single image; `docker-compose.yml` with `/data` volume mount and env passthrough.
-- [ ] GraalVM native-image note/optional profile (spec §1.2).
+- [x] **Ops hardening (partial)**: `/health` endpoint (`HealthController` — checks SQLite connectivity via the Hikari pool, returns `{"status":"UP"}` / `503`; `anyRequest().permitAll()` already exposes it) + `server.shutdown: graceful`. Remaining: rate limiting on auth endpoints, security headers, CORS restriction.
+- [x] **Docker multi-stage build** (`Dockerfile`): `node:24-alpine` builds the frontend → `maven:3.9-eclipse-temurin-25` packages the jar with the frontend embedded under `src/main/resources/static` → `eclipse-temurin:25-jre` runtime image (~181 MB). Runs as non-root (uid 1000 = standard first host user, so the bind-mounted `./data` stays writable), `JAVA_OPTS` silences the SQLite native-access warning + uses `UseSerialGC`, `curl` installed for the healthcheck. `.dockerignore` keeps build context slim (`node_modules`/`target`/`dist`/`data` excluded). `docker-compose.yml` ports 8080, mounts `./data:/data`, passes env through (`ALLOW_REGISTRATION`, `JWT_SECRET`, `JWT_TTL_SECONDS` — now a configurable `application.yml` property, `COOKIE_SECURE`), and adds a `/health` healthcheck (30s interval, 15s start period). Verified end-to-end: fresh compose up runs V1–V7 migrations, register/login/create-pension API works, frontend served at `/`, and data persists across `docker compose restart`. `HealthControllerIntegrationTest` added (102 tests pass).
+- [x] **GraalVM native-image note** (spec §1.2): README documents the optional `-Pnative` profile; requires generated runtime hints for Hibernate/Flyway/JDBC before it can compile, kept out of the default build.
 
 ### Frontend
 - [x] `/settings` page: targetIncome + retirementDate (Calendar with `view="month"`, yearNavigator, yearRange 2026:2080).
@@ -311,10 +311,11 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] `AuditServiceTest`: existing snapshot tests enable audit; `pensionSkipsAuditWhenDisabled` and `statementSkipsAuditWhenDisabled` verify no writes when setting off; `purgeDeletesAllAuditTypesForUser`, `purgeHandlesUserWithNoPensions`, `snapshotWritesCreateForEveryRecord` cover the toggle transitions.
 - [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted; `disablingAuditPurgesAuditData`, `enablingAuditSnapshotsRecords`, `noAuditActionWhenSettingUnchanged` verify the transition behaviour.
 - [x] `AuditControllerIntegrationTest`: verifies each audit endpoint returns rows in `auditTimestamp` descending order (UPDATE before CREATE), that UPDATE snapshots capture the pre-change value, and that a user cannot read another user's audit records (404).
+- [x] `HealthControllerIntegrationTest`: `/health` returns `200 {"status":"UP"}` without authentication.
 - [ ] FE smoke: settings save reflects on dashboard.
 
 ### Acceptance
-- [ ] Single container runs end-to-end; settings drive dashboard + analytics; README covers env vars and compose usage.
+- [x] Single container runs end-to-end; settings drive dashboard + analytics; README covers env vars and compose usage (Docker verified with a fresh compose up + restart persistence test).
 
 ---
 

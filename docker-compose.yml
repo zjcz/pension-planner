@@ -8,9 +8,16 @@ services:
     environment:
       SERVER_PORT: "8080"
       DATABASE_PATH: /data/pension.db
-      ALLOW_REGISTRATION: "true"
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
       JWT_SECRET: ${JWT_SECRET:-}
-      COOKIE_SECURE: "false"
+      JWT_TTL_SECONDS: ${JWT_TTL_SECONDS:-604800}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     volumes:
       - ./data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     restart: unless-stopped
