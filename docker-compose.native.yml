@@ -1,0 +1,8 @@
+# Native-image variant of the deployment. Use with:
+#   docker compose -f docker-compose.yml -f docker-compose.native.yml up -d --build
+services:
+  pension-planner:
+    build:
+      context: .
+      dockerfile: Dockerfile.native
+    image: pension-planner:native

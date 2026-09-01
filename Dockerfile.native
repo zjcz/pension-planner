@@ -1,0 +1,45 @@
+# ---- Stage 1: build frontend ----
+FROM node:24-alpine AS frontend-build
+WORKDIR /build/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ---- Stage 2: compile backend to a GraalVM native executable ----
+FROM ghcr.io/graalvm/graalvm-community:25 AS native-build
+# Maven 3.9.11 (same as the local dev toolchain)
+ARG MAVEN_VERSION=3.9.11
+RUN curl -sSL https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+        | tar -xzC /opt \
+    && ln -s /opt/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/local/bin/mvn
+WORKDIR /build/backend
+COPY backend/pom.xml ./
+RUN mvn -q -DskipTests dependency:go-offline
+COPY backend/ ./
+COPY --from=frontend-build /build/frontend/dist ./src/main/resources/static
+# -J-Xmx4g caps the native-image heap for constrained CI/docker build runners.
+RUN mvn -q -Pnative -DskipTests -Dnative-image.build-args=-J-Xmx4g native:compile
+
+# ---- Stage 3: runtime image (glibc only; no JVM needed) ----
+FROM debian:bookworm-slim
+WORKDIR /app
+
+# curl is used by the docker-compose healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /data && chown 1000:1000 /data
+
+COPY --from=native-build --chown=1000:1000 /build/backend/target/pension-planner ./pension-planner
+
+ENV SERVER_PORT=8080
+ENV DATABASE_PATH=/data/pension.db
+ENV ALLOW_REGISTRATION=true
+ENV COOKIE_SECURE=false
+
+VOLUME ["/data"]
+EXPOSE 8080
+
+USER 1000:1000
+ENTRYPOINT ["./pension-planner"]

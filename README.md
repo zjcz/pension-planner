@@ -105,7 +105,21 @@ All settings are environment variables (defaults shown):
 
 ## GraalVM native image
 
-Spring Boot supports Ahead-of-Time (AOT) native compilation via the `spring-boot-maven-plugin` `native` profile (`./mvnw -Pnative`). This is an **optional profile** kept out of the default build — the Docker image uses the regular JVM fat JAR. Note that a Spring Data + Hibernate + Flyway (SQLite) stack needs extra runtime hints (Hibernate proxy/bytecode enhancement, Flyway and JDBC reflection) to compile to a working native image; see the Spring Boot "GraalVM Native Image" reference for the configuration required before enabling the profile.
+The backend compiles to a native executable via the GraalVM `native` Maven profile (`mvn -Pnative -DskipTests native:compile`, run from `backend/` with a GraalVM for JDK 25 on `PATH`/`JAVA_HOME`). This produces a single `backend/target/pension-planner` ELF binary (~150 MB) that starts in ~0.4 s with no JVM.
+
+The profile uses `native-maven-plugin` (configuration in `backend/pom.xml`) with the GraalVM reachability metadata repository enabled and `fallback=false`. Runtime hints for reflection/JNI are provided by `NativeRuntimeHints` (`com.pensionplanner.config`) and wired via `@ImportRuntimeHints` on `PensionPlannerApplication`. They cover:
+
+- **JJWT** (`io.jsonwebtoken.*`): the impl/factory classes (`KeysBridge`, `DefaultJwtBuilder`, `DefaultJwtParserBuilder`, claims/header builders, `Standard*Algorithms`/`JwksBridge`, …) that JJWT loads reflectively.
+- **SQLite / Flyway / Hibernate**: `META-INF/services/java.sql.Driver` (driver ServiceLoader), the `org/sqlite/native/Linux/*/libsqlitejdbc.so` JNI library (extracted to a temp file at runtime), the `org.sqlite.JDBC` driver class, and the `org.hibernate.community.dialect.SQLiteDialect` (loaded by `Class.forName` from `spring.jpa.properties.hibernate.dialect`).
+
+Two configuration notes that are required for the native build to work:
+
+- **Flyway must match Spring Boot's managed version.** The pom previously pinned `flyway.version=12.6.2`; the AOT-generated `NativeImageResourceProviderCustomizer` compiles against the `Scanner` constructor signature of the Flyway version Boot manages (11.7.2), so a 12.x core yields `NoSuchMethodError` in the native binary. The pin was removed so `flyway-core` follows Spring Boot 3.5 (11.7.2), which includes SQLite support in core — the separate `flyway-database-nc-sqlite` module (12.x only) is not needed.
+- JVM run is unaffected; the same binary works for `java -jar`.
+
+Run locally: `server.shutdown: graceful` is set; start with the `DATABASE_PATH` (default `/data/pension.db`), `ALLOW_REGISTRATION`, `COOKIE_SECURE`, `SERVER_PORT` env vars as per the table above.
+
+A native container is also available: `Dockerfile.native` compiles inside `ghcr.io/graalvm/graalvm-community:25` and runs the binary in a `debian:bookworm-slim` image (glibc, no JVM; ~85 MB). Use `docker compose -f docker-compose.yml -f docker-compose.native.yml up -d --build` — it keeps the same env vars, `/data` volume, and `/health` healthcheck. The default `docker compose up` still uses the JVM fat-JAR image.
 
 ## Debugging
 

@@ -19,7 +19,6 @@
 
     <properties>
         <java.version>25</java.version>
-        <flyway.version>12.6.2</flyway.version>
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
 
@@ -54,12 +53,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-nc-sqlite</artifactId>
-            <version>${flyway.version}</version>
         </dependency>
 
         <dependency>
@@ -100,4 +93,28 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.10.6</version>
+                        <configuration>
+                            <imageName>pension-planner</imageName>
+                            <mainClass>com.pensionplanner.PensionPlannerApplication</mainClass>
+                            <fallback>false</fallback>
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+                        </configuration>
+                        <extensions>true</extensions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
