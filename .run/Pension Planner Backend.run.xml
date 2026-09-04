@@ -1,15 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Pension Planner Backend" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="com.pensionplanner.PensionPlannerApplication" />
-    <module name="pension-planner-backend" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="JVM_OPTIONS" value="--enable-native-access=ALL-UNNAMED" />
-    <option name="ENABLE_JFR" value="false" />
     <envs>
       <env name="DATABASE_PATH" value="./data/pension.db" />
       <env name="SERVER_PORT" value="8080" />
       <env name="ALLOW_REGISTRATION" value="true" />
+      <env name="CORS_ALLOWED_ORIGINS" value="http://localhost:5173" />
     </envs>
+    <option name="MAIN_CLASS_NAME" value="com.pensionplanner.PensionPlannerApplication" />
+    <module name="pension-planner-backend" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

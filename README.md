@@ -102,6 +102,12 @@ All settings are environment variables (defaults shown):
 | `JWT_SECRET`         | *(empty)*       | Secret used to sign JWTs. Leave empty for a random per-run secret   |
 | `JWT_TTL_SECONDS`    | `604800`        | JWT lifetime in seconds (defaults to 1 week)                        |
 | `COOKIE_SECURE`      | `false`         | Set `true` to send the JWT cookie only over HTTPS                   |
+| `AUTH_RATE_LIMIT_ENABLED` | `true`     | Rate limiting of `/auth/register` and `/auth/login` (token bucket per IP) |
+| `AUTH_RATE_LIMIT_CAPACITY` | `20`       | Max burst of auth requests before a `429 Too Many Requests`          |
+| `AUTH_RATE_LIMIT_PER_MINUTE` | `10`     | Sustained auth request allowance per IP (bucket refill rate)        |
+| `CORS_ALLOWED_ORIGINS` | *(empty)*    | Comma-separated origins allowed to call the API cross-origin. Empty = cross-origin requests are rejected; the frontend is served same-origin |
+
+Security hardening baked in: every response carries `Content-Security-Policy` (`default-src 'self'`), `Referrer-Policy: no-referrer`, `Permissions-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and `Cache-Control: no-store`. The rate limiter honours `X-Forwarded-For`, so requests behind a reverse proxy are keyed by the real client IP.
 
 ## GraalVM native image
 
