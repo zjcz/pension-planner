@@ -67,7 +67,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .headers(headers -> headers
                         .addHeaderWriter(new StaticHeadersWriter("Content-Security-Policy",
-                                "default-src 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self'; font-src 'self' data:"))
+                                "default-src 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:"))
                         .addHeaderWriter(new StaticHeadersWriter("Referrer-Policy", "no-referrer"))
                         .addHeaderWriter(new StaticHeadersWriter("Permissions-Policy",
                                 "camera=(), microphone=(), geolocation=(), payment=()")))

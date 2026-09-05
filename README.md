@@ -107,7 +107,7 @@ All settings are environment variables (defaults shown):
 | `AUTH_RATE_LIMIT_PER_MINUTE` | `10`     | Sustained auth request allowance per IP (bucket refill rate)        |
 | `CORS_ALLOWED_ORIGINS` | *(empty)*    | Comma-separated origins allowed to call the API cross-origin. Empty = cross-origin requests are rejected; the frontend is served same-origin |
 
-Security hardening baked in: every response carries `Content-Security-Policy` (`default-src 'self'`), `Referrer-Policy: no-referrer`, `Permissions-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and `Cache-Control: no-store`. The rate limiter honours `X-Forwarded-For`, so requests behind a reverse proxy are keyed by the real client IP.
+Security hardening baked in: every response carries `Content-Security-Policy` (`default-src 'self'`; inline scripts are blocked, inline `style` attributes are allowed via `'unsafe-inline'` since React/PrimeReact rely on them), `Referrer-Policy: no-referrer`, `Permissions-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and `Cache-Control: no-store`. The rate limiter honours `X-Forwarded-For`, so requests behind a reverse proxy are keyed by the real client IP.
 
 ## GraalVM native image
 

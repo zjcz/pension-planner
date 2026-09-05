@@ -26,6 +26,8 @@ class SecurityHeadersIntegrationTest {
                         containsString("default-src 'self'")))
                 .andExpect(header().string("Content-Security-Policy",
                         containsString("frame-ancestors 'none'")))
+                .andExpect(header().string("Content-Security-Policy",
+                        containsString("style-src 'self' 'unsafe-inline'")))
                 .andExpect(header().string("X-Content-Type-Options", "nosniff"))
                 .andExpect(header().string("X-Frame-Options", "DENY"))
                 .andExpect(header().string("Referrer-Policy", "no-referrer"))
