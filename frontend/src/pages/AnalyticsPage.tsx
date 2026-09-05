@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Chart } from 'primereact/chart';
-import { Message } from 'primereact/message';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { PageError } from '../components/PageError';
+import { PageLoading } from '../components/PageLoading';
 import { useAnalytics } from '../hooks/useAnalytics';
 
 function formatCurrency(value: number): string {
@@ -45,7 +46,7 @@ export default function AnalyticsPage() {
     return (
       <div>
         <Toolbar start={start} end={end} />
-        <div className="p-4"><Message severity="info" text="Loading..." className="w-full" /></div>
+        <PageLoading />
       </div>
     );
   }
@@ -54,7 +55,7 @@ export default function AnalyticsPage() {
     return (
       <div>
         <Toolbar start={start} end={end} />
-        <div className="p-4"><Message severity="error" text={apiErrorMessage(error)} className="w-full" /></div>
+        <PageError message={apiErrorMessage(error)} />
       </div>
     );
   }

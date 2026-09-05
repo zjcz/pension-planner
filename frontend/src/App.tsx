@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import { SessionExpiredWatcher } from './auth/SessionExpiredWatcher';
 import AnalyticsPage from './pages/AnalyticsPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -35,6 +36,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <SessionExpiredWatcher router={router} />
         <RouterProvider router={router} />
       </AuthProvider>
     </QueryClientProvider>

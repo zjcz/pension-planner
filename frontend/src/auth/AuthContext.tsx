@@ -9,6 +9,7 @@ interface AuthContextValue {
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  markSessionExpired: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -49,6 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
+  const markSessionExpired = useCallback(() => {
+    queryClient.setQueryData(['auth', 'me'], null);
+    queryClient.clear();
+  }, [queryClient]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: isError ? null : (user ?? null),
@@ -56,8 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      markSessionExpired,
     }),
-    [user, isError, isLoading, login, register, logout],
+    [user, isError, isLoading, login, register, logout, markSessionExpired],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

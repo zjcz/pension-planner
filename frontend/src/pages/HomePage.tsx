@@ -12,6 +12,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { AuditDialog, formatLong } from '../components/AuditDialog';
+import { PageError } from '../components/PageError';
 import { PensionFormDialog } from '../components/PensionFormDialog';
 import { OtherIncomeDialog } from '../components/OtherIncomeDialog';
 import { SettingsDialog } from '../components/SettingsDialog';
@@ -64,7 +65,7 @@ export default function HomePage() {
     useOtherIncomeAudit(oiAuditTarget?.id ?? -1, oiAuditTarget != null && auditEnabled);
 
   const { data: pensions, isLoading, isError, error } = usePensions();
-  const { data: dashboard } = useDashboard();
+  const { data: dashboard, isLoading: dashboardLoading, isError: dashboardError, error: dashboardErr } = useDashboard();
   const { data: otherIncomeItems, isLoading: oiLoading, isError: oiError, error: oiErr } = useOtherIncomeList();
   const createPension = useCreatePension();
   const updatePension = useUpdatePension();
@@ -190,6 +191,19 @@ export default function HomePage() {
 
       <div className="p-4">
         {/* Summary Cards */}
+        {dashboardError && <PageError message={apiErrorMessage(dashboardErr)} />}
+        {!dashboardError && dashboardLoading && (
+          <div className="grid mb-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="col-12 md:col-6 lg:col-3">
+                <Card className="h-full">
+                  <div className="text-secondary" style={{ opacity: 0.6 }}>Loading...</div>
+                </Card>
+              </div>
+            ))}
+          </div>
+        )}
+        {!dashboardLoading && !dashboardError && (
         <div className="grid mb-4">
           <div className="col-12 md:col-6 lg:col-3">
             <Card title="Portfolio Value" className="h-full">
@@ -246,6 +260,7 @@ export default function HomePage() {
             </Card>
           </div>
         </div>
+        )}
 
         {/* Pensions Table */}
         <div className="flex justify-content-between align-items-center mt-0 mb-3">

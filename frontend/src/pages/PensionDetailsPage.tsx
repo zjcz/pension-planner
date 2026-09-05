@@ -11,6 +11,8 @@ import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { AuditDialog, formatLong } from '../components/AuditDialog';
+import { PageError } from '../components/PageError';
+import { PageLoading } from '../components/PageLoading';
 import { StatementFormDialog } from '../components/StatementFormDialog';
 import { useStatementAudit } from '../hooks/useAudit';
 import { usePension } from '../hooks/usePensions';
@@ -167,7 +169,7 @@ export default function PensionDetailsPage() {
     return (
       <div>
         <Toolbar start={start} end={end} />
-        <div className="p-4"><Message severity="info" text="Loading..." className="w-full" /></div>
+        <PageLoading />
       </div>
     );
   }
@@ -176,7 +178,7 @@ export default function PensionDetailsPage() {
     return (
       <div>
         <Toolbar start={start} end={end} />
-        <div className="p-4"><Message severity="error" text={apiErrorMessage(pensionErr)} className="w-full" /></div>
+        <PageError message={apiErrorMessage(pensionErr)} />
       </div>
     );
   }
