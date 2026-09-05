@@ -146,7 +146,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Tests
 - [x] Backend: dashboard aggregation with empty data, single pension, multiple pensions + StatePension/OtherIncome; correct latest-statement pick.
-- [ ] FE smoke: dashboard renders cards and table.
+- [x] FE smoke: dashboard renders cards and table.
 
 ### Acceptance
 - [x] Dashboard shows correct totals and countdown; row actions wired to modals.
@@ -171,7 +171,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Tests
 - [x] Backend: create/update/delete scoped to user; validation errors; audit rows written with correct action/timestamp.
-- [ ] FE smoke: modal create/edit flow.
+- [x] FE smoke: modal create/edit flow.
 
 ### Acceptance
 - [x] Pensions CRUD works from Dashboard and (once built) Pension Details; audit history populated.
@@ -229,10 +229,10 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Tests
 - [x] Backend: upsert creates once, updates thereafter; audit history; user isolation; validation rejects bad ranges.
-- [ ] FE smoke: form loads existing record and saves.
+- [x] FE smoke: form loads existing record and saves.
 
 ### Acceptance
-- [ ] State pension editable from dashboard card; reflected in dashboard totals.
+- [x] State pension editable from dashboard card; reflected in dashboard totals.
 
 ---
 
@@ -253,7 +253,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Tests
 - [x] Backend: CRUD scoped to user; audit rows; validation.
-- [ ] FE smoke: table + chart render; add/edit/delete flows.
+- [x] FE smoke: table + chart render; add/edit/delete flows.
 
 ### Acceptance
 - [x] Other income streams fully maintained; chart updates.
@@ -281,7 +281,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 
 ### Tests
 - [x] Backend: projection math unit tests (simple + compound growth, edge dates); aggregation across pensions.
-- [ ] FE smoke: all four charts render with fixture data.
+- [x] FE smoke: all four charts render with fixture data.
 
 ### Acceptance
 - [x] Charts reflect DB data and targets; reference line at retirement date.
@@ -312,7 +312,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] `UserSettingsServiceTest`: `updateStoresAuditEnabled` verifies the flag is persisted; `disablingAuditPurgesAuditData`, `enablingAuditSnapshotsRecords`, `noAuditActionWhenSettingUnchanged` verify the transition behaviour.
 - [x] `AuditControllerIntegrationTest`: verifies each audit endpoint returns rows in `auditTimestamp` descending order (UPDATE before CREATE), that UPDATE snapshots capture the pre-change value, and that a user cannot read another user's audit records (404).
 - [x] `HealthControllerIntegrationTest`: `/health` returns `200 {"status":"UP"}` without authentication.
-- [ ] FE smoke: settings save reflects on dashboard.
+- [x] FE smoke: settings save reflects on dashboard.
 
 ### Acceptance
 - [x] Single container runs end-to-end; settings drive dashboard + analytics; README covers env vars and compose usage (Docker verified with a fresh compose up + restart persistence test).
@@ -341,7 +341,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] `TagServiceTest`: list scoped to user, create, delete with join cleanup, not-found / cross-user rejection.
 - [x] `TagControllerIntegrationTest`: create/list/delete flow, validation rejects blank name, per-user isolation.
 - [x] `PensionServiceTest` / `OtherIncomeServiceTest`: updated for new `tagIds` parameter.
-- [ ] FE smoke: tag creation and assignment in pension/income dialogs.
+- [x] FE smoke: tag creation and assignment in pension/income dialogs.
 
 ### Acceptance
 - [x] Tags can be created and assigned to pensions and other income; tags display as chips in DataTables.

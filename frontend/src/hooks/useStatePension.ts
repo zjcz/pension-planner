@@ -17,6 +17,7 @@ export function useUpsertStatePension() {
     mutationFn: (request: StatePensionRequest) => statePensionApi.upsert(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: STATE_PENSION_KEY });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 }

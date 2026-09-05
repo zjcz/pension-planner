@@ -127,11 +127,35 @@ Run locally: `server.shutdown: graceful` is set; start with the `DATABASE_PATH` 
 
 A native container is also available: `Dockerfile.native` compiles inside `ghcr.io/graalvm/graalvm-community:25` and runs the binary in a `debian:bookworm-slim` image (glibc, no JVM; ~85 MB). Use `docker compose -f docker-compose.yml -f docker-compose.native.yml up -d --build` — it keeps the same env vars, `/data` volume, and `/health` healthcheck. The default `docker compose up` still uses the JVM fat-JAR image.
 
+## Testing
+
+### Backend
+
+- **Stack**: JUnit 5 + Spring Boot Test (`MockMvc` + `spring-security-test`), 110 tests across unit and integration suites.
+- **Run**: 
+  ```bash
+  cd backend && mvn test
+  ```
+- Any single test: `mvn test -Dtest=AuthRateLimitIntegrationTest`.
+- Test config lives in `backend/src/test/`; a test-only `application.properties` disables the auth rate limiter (a shared in-memory database would otherwise let one test class exhaust another's token bucket, causing spurious `429`s).
+
+### Frontend
+
+- **Stack**: Vitest 5 + React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`) with `jsdom`; API calls are intercepted by **MSW** (Mock Service Worker) against an in-memory fixture database, so `npm test` needs no running backend.
+- **Run**:
+  ```bash
+  cd frontend && npm test        # single run
+  npm run test:watch             # watch mode
+  ```
+- Smoke tests live next to the pages they exercise (`frontend/src/pages/*.smoke.test.tsx`) and cover the PLAN phases: dashboard, pension modal create/edit, state pension, other income + statements (table/chart/add/edit/delete), analytics charts, settings and tag creation/assignment.
+- Fixtures + MSW handlers: `frontend/src/test/` (`fixtures.ts`, `handlers.ts`, `server.ts`). Handlers keep mutable state that is reset per test; assertions are written against the DOM only.
+- For determinism in `jsdom`, PrimeReact's popup-heavy controls are mocked with lightweight equivalents under `frontend/src/test/mocks/` (`Calendar`, `InputNumber`, `Chart`, `MultiSelect`). This is what makes date/number/tag interactions reliable without a browser.
+
 ## Debugging
 
 - **Backend**: run **Pension Planner Backend** in IntelliJ and set breakpoints in Java code; they are hit when the API is called from the frontend. The run config includes `--enable-native-access=ALL-UNNAMED` to silence harmless SQLite native-access warnings (add it to any manual `java -jar` launches too).
 - **Frontend**: use your browser's DevTools. Vite hot-reloads on save — hard-refresh (`Ctrl+Shift+R`) if changes don't appear.
-- **Tests**: `mvn test` from `backend/` runs the backend test suite (unit + integration). Run the frontend build with `npm run build` in `frontend/`.
+- **Tests**: see the [Testing](#testing) section for how to run the backend and frontend suites.
 
 ## Third-party libraries
 
