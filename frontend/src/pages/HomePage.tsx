@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
@@ -10,6 +11,7 @@ import { ProgressBar } from 'primereact/progressbar';
 import { Tag } from 'primereact/tag';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
+import { infoApi } from '../api/info';
 import { useAuth } from '../auth/AuthContext';
 import { AuditDialog, formatLong } from '../components/AuditDialog';
 import { PageError } from '../components/PageError';
@@ -59,6 +61,11 @@ export default function HomePage() {
 
   const { data: settings } = useSettings();
   const auditEnabled = settings?.auditEnabled ?? false;
+  const { data: appInfo } = useQuery({
+    queryKey: ['info'],
+    queryFn: infoApi.get,
+    staleTime: Infinity,
+  });
   const { data: pensionAuditRecords = [], isLoading: pensionAuditLoading, isError: pensionAuditError, error: pensionAuditErr } =
     usePensionAudit(pensionAuditTarget?.pensionId ?? -1, pensionAuditTarget != null && auditEnabled);
   const { data: oiAuditRecords = [], isLoading: oiAuditLoading, isError: oiAuditError, error: oiAuditErr } =
@@ -381,6 +388,10 @@ export default function HomePage() {
         ]}
       />
       <ConfirmDialog />
+
+<footer className="px-4 pb-4 pt-1">
+        <div className="text-sm" style={{ color: '#c0c0c0' }}>App Version: v{appInfo?.version ?? ''}</div>
+      </footer>
     </div>
   );
 }

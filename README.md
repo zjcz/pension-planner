@@ -127,6 +127,53 @@ Run locally: `server.shutdown: graceful` is set; start with the `DATABASE_PATH` 
 
 A native container is also available: `Dockerfile.native` compiles inside `ghcr.io/graalvm/graalvm-community:25` and runs the binary in a `debian:bookworm-slim` image (glibc, no JVM; ~85 MB). Use `docker compose -f docker-compose.yml -f docker-compose.native.yml up -d --build` — it keeps the same env vars, `/data` volume, and `/health` healthcheck. The default `docker compose up` still uses the JVM fat-JAR image.
 
+## Releases
+
+Images are published to **GitHub Container Registry (GHCR)** by the workflow in `.github/workflows/native-docker.yml`. It builds the native image for `linux/amd64` and `linux/arm64`, pushes it to `ghcr.io/<owner>/pension-planner`, and creates a GitHub Release — but only when you push a version tag.
+
+### Release process
+
+1. Work on feature branches and merge into `main` — batches of commits can accumulate there unreleased.
+2. When ready to ship, bump the version (once) in `backend/pom.xml`, commit, and merge.
+3. Tag and push:
+   ```bash
+   git tag v1.2.3
+   git push origin v1.2.3
+   ```
+4. The workflow runs: builds both architectures, pushes the container, and creates a GitHub Release with notes auto-generated from the PRs since the previous tag.
+
+Because releases are tag-driven, `latest` on GHCR always points at the most recent release.
+
+### Versioning
+
+`backend/pom.xml`'s `<version>` is the single source of truth. Maven filters it into `application.yml` (`app.version`, via the `@project.version@` placeholder), the backend exposes it at `GET /api/v1/info`, and the frontend renders it (e.g. `v0.1.0` in the home toolbar). Release tags should match the pom version (drop the `-SNAPSHOT` suffix for a real release).
+
+### Running from GHCR
+
+Pull the published image and run it exactly like the locally built one:
+
+```bash
+docker pull ghcr.io/<owner>/pension-planner:latest
+mkdir -p data
+docker run --rm -p 8080:8080 -v "$PWD/data:/data" ghcr.io/<owner>/pension-planner:latest
+```
+
+Available tags: `<version>` (e.g. `1.2.3`), `<major>.<minor>` (`1.2`), `<major>` (`1`), the `v`-prefixed tag, and `latest`. `latest` requires a Docker registry / `docker login ghcr.io` for private images; public ones pull without auth.
+
+To run the published image with Docker Compose instead of the local build, create an override that uses the GHCR image with the same env vars, `/data` volume, and healthcheck (mirroring the native variant):
+
+```yaml
+# docker-compose.ghcr.yml
+services:
+  pension-planner:
+    image: ghcr.io/<owner>/pension-planner:latest
+    build: null
+```
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
+```
+
 ## Testing
 
 ### Backend

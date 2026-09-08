@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import {
   analytics,
+  appInfo,
   authConfig,
   dashboard,
   otherIncomeItems,
@@ -27,6 +28,7 @@ export function resetHandlersState() {
 }
 
 export const handlers = [
+  http.get(`${V1}/info`, () => HttpResponse.json(appInfo)),
   http.get(`${V1}/auth/config`, () => HttpResponse.json(authConfig)),
   http.get(`${V1}/auth/me`, () => HttpResponse.json(user)),
   http.post(`${V1}/auth/logout`, () => new HttpResponse(null, { status: 200 })),

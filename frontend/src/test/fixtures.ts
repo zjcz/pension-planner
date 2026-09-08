@@ -1,5 +1,6 @@
 import type {
   AnalyticsDto,
+  AppInfo,
   AuthConfig,
   DashboardDto,
   OtherIncome,
@@ -14,6 +15,8 @@ import type {
 export const user: User = { id: 1, username: 'jdoe', createdAt: '2026-01-01T00:00:00' };
 
 export const authConfig: AuthConfig = { allowRegistration: true };
+
+export const appInfo: AppInfo = { name: 'pension-planner', version: '0.1.0' };
 
 export const settings: Settings = {
   targetIncome: 30000,

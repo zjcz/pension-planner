@@ -8,6 +8,11 @@ export interface AuthConfig {
   allowRegistration: boolean;
 }
 
+export interface AppInfo {
+  name: string;
+  version: string;
+}
+
 export interface Settings {
   targetIncome: number | null;
   retirementDate: string | null;
