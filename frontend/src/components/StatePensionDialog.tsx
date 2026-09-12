@@ -64,7 +64,7 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
   const footer = (
     <div className="flex justify-content-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
-      <Button label="Save" icon="pi pi-check" onClick={handleSave} loading={loading} />
+      <Button label={item ? 'Save Changes' : 'Create'} icon="pi pi-check" onClick={handleSave} loading={loading} />
     </div>
   );
 
