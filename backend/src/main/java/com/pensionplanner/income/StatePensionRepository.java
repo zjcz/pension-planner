@@ -2,9 +2,12 @@ package com.pensionplanner.income;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StatePensionRepository extends JpaRepository<StatePension, Long> {
 
-    Optional<StatePension> findByUserId(Long userId);
+    List<StatePension> findByUserIdOrderByNameAsc(Long userId);
+
+    Optional<StatePension> findByIdAndUserId(Long id, Long userId);
 }

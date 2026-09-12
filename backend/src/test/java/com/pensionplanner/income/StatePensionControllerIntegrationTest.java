@@ -3,6 +3,7 @@ package com.pensionplanner.income;
 import com.pensionplanner.audit.StatePensionAudit;
 import com.pensionplanner.audit.StatePensionAuditRepository;
 import com.pensionplanner.user.UserRepository;
+import com.jayway.jsonpath.JsonPath;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,23 +37,25 @@ class StatePensionControllerIntegrationTest {
     UserRepository userRepository;
 
     @Test
-    void getReturnsNullWhenNotCreated() throws Exception {
+    void listReturnsEmptyWhenNothingCreated() throws Exception {
         Cookie cookie = register("sp_alice", "password123");
 
         mockMvc.perform(get("/api/v1/state-pension").cookie(cookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist());
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
-    void upsertCreatesAndAudits() throws Exception {
+    void createPersistsAndAudits() throws Exception {
         Cookie cookie = register("sp_bob", "password123");
 
-        mockMvc.perform(put("/api/v1/state-pension")
+        mockMvc.perform(post("/api/v1/state-pension")
                         .cookie(cookie)
                         .contentType("application/json")
-                        .content("{\"yearlyAmount\":10000,\"takesEffectYear\":2026}"))
-                .andExpect(status().isOk())
+                        .content("{\"name\":\"My Pension\",\"yearlyAmount\":10000,\"takesEffectYear\":2026}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("My Pension"))
                 .andExpect(jsonPath("$.yearlyAmount").value(10000))
                 .andExpect(jsonPath("$.takesEffectYear").value(2026));
 
@@ -59,23 +64,45 @@ class StatePensionControllerIntegrationTest {
                 .filter(a -> a.getUserId() != null && a.getUserId().equals(userId))
                 .map(StatePensionAudit::getAction)
                 .toList()).containsExactly("CREATE");
+        assertThat(statePensionRepository.findByUserIdOrderByNameAsc(userId)).hasSize(1);
     }
 
     @Test
-    void upsertIsIdempotentUpdatesAndAudits() throws Exception {
+    void createAllowsMultipleRecordsPerUser() throws Exception {
+        Cookie cookie = register("sp_multi", "password123");
+        Long userId = getUserId("sp_multi");
+
+        mockMvc.perform(post("/api/v1/state-pension")
+                        .cookie(cookie)
+                        .contentType("application/json")
+                        .content("{\"name\":\"Mine\",\"yearlyAmount\":11000,\"takesEffectYear\":2040}"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/v1/state-pension")
+                        .cookie(cookie)
+                        .contentType("application/json")
+                        .content("{\"name\":\"Partner\",\"yearlyAmount\":7000,\"takesEffectYear\":2042}"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/state-pension").cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+
+        assertThat(statePensionRepository.findByUserIdOrderByNameAsc(userId)).hasSize(2);
+    }
+
+    @Test
+    void updateChangesAndAudits() throws Exception {
         Cookie cookie = register("sp_carol", "password123");
 
-        mockMvc.perform(put("/api/v1/state-pension")
-                        .cookie(cookie)
-                        .contentType("application/json")
-                        .content("{\"yearlyAmount\":10000,\"takesEffectYear\":2026}"))
-                .andExpect(status().isOk());
+        String id = createStatePension(cookie, "First", 10000, 2026);
 
-        mockMvc.perform(put("/api/v1/state-pension")
+        mockMvc.perform(put("/api/v1/state-pension/" + id)
                         .cookie(cookie)
                         .contentType("application/json")
-                        .content("{\"yearlyAmount\":12000,\"takesEffectYear\":2030}"))
+                        .content("{\"name\":\"Renamed\",\"yearlyAmount\":12000,\"takesEffectYear\":2030}"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Renamed"))
                 .andExpect(jsonPath("$.yearlyAmount").value(12000))
                 .andExpect(jsonPath("$.takesEffectYear").value(2030));
 
@@ -85,17 +112,40 @@ class StatePensionControllerIntegrationTest {
                 .map(StatePensionAudit::getAction)
                 .toList()).containsExactly("CREATE", "UPDATE");
 
-        assertThat(statePensionRepository.findByUserId(userId).orElseThrow().getYearlyAmount()).isEqualTo(12000L);
+        assertThat(statePensionRepository.findByIdAndUserId(Long.valueOf(id), userId).orElseThrow().getYearlyAmount()).isEqualTo(12000L);
+    }
+
+    @Test
+    void deleteRemovesAndAudits() throws Exception {
+        Cookie cookie = register("sp_dave", "password123");
+        Long userId = getUserId("sp_dave");
+
+        String id = createStatePension(cookie, "Doomed", 9000, 2028);
+
+        mockMvc.perform(delete("/api/v1/state-pension/" + id).cookie(cookie))
+                .andExpect(status().isNoContent());
+
+        assertThat(statePensionRepository.findByIdAndUserId(Long.valueOf(id), userId)).isEmpty();
+        assertThat(statePensionAuditRepository.findAll().stream()
+                .filter(a -> a.getUserId() != null && a.getUserId().equals(userId))
+                .map(StatePensionAudit::getAction)
+                .toList()).containsExactly("CREATE", "DELETE");
     }
 
     @Test
     void validationRejectsBadRanges() throws Exception {
-        Cookie cookie = register("sp_dave", "password123");
+        Cookie cookie = register("sp_erin", "password123");
 
-        mockMvc.perform(put("/api/v1/state-pension")
+        mockMvc.perform(post("/api/v1/state-pension")
                         .cookie(cookie)
                         .contentType("application/json")
-                        .content("{\"yearlyAmount\":-1,\"takesEffectYear\":2026}"))
+                        .content("{\"name\":\"X\",\"yearlyAmount\":-1,\"takesEffectYear\":2026}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/v1/state-pension")
+                        .cookie(cookie)
+                        .contentType("application/json")
+                        .content("{\"yearlyAmount\":1000,\"takesEffectYear\":2026}"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -104,15 +154,25 @@ class StatePensionControllerIntegrationTest {
         Cookie alice = register("sp_eve", "password123");
         Cookie bob = register("sp_frank", "password123");
 
-        mockMvc.perform(put("/api/v1/state-pension")
+        mockMvc.perform(post("/api/v1/state-pension")
                         .cookie(alice)
                         .contentType("application/json")
-                        .content("{\"yearlyAmount\":10000,\"takesEffectYear\":2026}"))
-                .andExpect(status().isOk());
+                        .content("{\"name\":\"Alice SP\",\"yearlyAmount\":10000,\"takesEffectYear\":2026}"))
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/state-pension").cookie(bob))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist());
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    private String createStatePension(Cookie cookie, String name, int yearlyAmount, int takesEffectYear) throws Exception {
+        return JsonPath.read(mockMvc.perform(post("/api/v1/state-pension")
+                .cookie(cookie)
+                .contentType("application/json")
+                .content("{\"name\":\"" + name + "\",\"yearlyAmount\":" + yearlyAmount
+                        + ",\"takesEffectYear\":" + takesEffectYear + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.id").toString();
     }
 
     private Cookie register(String username, String password) throws Exception {

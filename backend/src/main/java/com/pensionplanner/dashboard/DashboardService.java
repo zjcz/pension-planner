@@ -65,13 +65,11 @@ public class DashboardService {
             }
         }
 
-        DashboardDto.StatePensionSummary statePensionSummary = null;
-        Optional<StatePension> statePension = statePensionRepository.findByUserId(userId);
-        if (statePension.isPresent()) {
-            StatePension sp = statePension.get();
-            statePensionSummary = new DashboardDto.StatePensionSummary(sp.getYearlyAmount(), sp.getTakesEffectYear());
-            totalProjectedAnnualIncome += sp.getYearlyAmount();
-        }
+        List<StatePension> statePensions = statePensionRepository.findByUserIdOrderByNameAsc(userId);
+        List<DashboardDto.StatePensionSummary> statePensionSummaries = statePensions.stream()
+                .map(sp -> new DashboardDto.StatePensionSummary(sp.getId(), sp.getName(), sp.getYearlyAmount(), sp.getTakesEffectYear()))
+                .toList();
+        totalProjectedAnnualIncome += statePensions.stream().mapToLong(StatePension::getYearlyAmount).sum();
 
         List<OtherIncome> otherIncomes = otherIncomeRepository.findByUserIdOrderByNameAsc(userId);
         List<DashboardDto.OtherIncomeSummary> otherIncomeSummaries = otherIncomes.stream()
@@ -85,7 +83,7 @@ public class DashboardService {
                 totalPortfolioValue,
                 totalProjectedAnnualIncome,
                 settings != null ? settings.getTargetIncome() : null,
-                statePensionSummary,
+                statePensionSummaries,
                 otherIncomeSummaries,
                 settings != null ? settings.getRetirementDate() : null
         );

@@ -131,8 +131,10 @@ public class AnalyticsService {
             }
         }
 
-        StatePension sp = statePensionRepository.findByUserId(userId).orElse(null);
-        long statePensionAnnual = sp != null ? sp.getYearlyAmount() : 0;
+        List<StatePension> statePensions = statePensionRepository.findByUserIdOrderByNameAsc(userId);
+        List<AnalyticsDto.StatePensionBreakdown> statePensionBreakdown = statePensions.stream()
+                .map(sp -> new AnalyticsDto.StatePensionBreakdown(sp.getName(), sp.getYearlyAmount()))
+                .toList();
 
         List<OtherIncome> otherIncomes = otherIncomeRepository.findByUserIdOrderByNameAsc(userId);
         List<AnalyticsDto.OtherIncomeBreakdown> oiBreakdown = otherIncomes.stream()
@@ -180,7 +182,7 @@ public class AnalyticsService {
                 projections,
                 growthCosts,
                 incomeBreakdown,
-                statePensionAnnual,
+                statePensionBreakdown,
                 oiBreakdown,
                 historySeries);
     }

@@ -16,7 +16,7 @@ public class StatePension {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "userId", nullable = false, unique = true)
+    @Column(name = "userId", nullable = false)
     private Long userId;
 
     @Column(name = "name", nullable = false)

@@ -35,7 +35,7 @@ class AnalyticsServiceTest {
     @Test
     void emptyDataReturnsEmptyAnalytics() {
         when(pensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.empty());
 
@@ -47,7 +47,7 @@ class AnalyticsServiceTest {
         assertThat(result.projections()).isEmpty();
         assertThat(result.pensionGrowthCosts()).isEmpty();
         assertThat(result.pensionIncomeBreakdown()).isEmpty();
-        assertThat(result.statePensionAnnual()).isEqualTo(0L);
+        assertThat(result.statePensionBreakdown()).isEmpty();
         assertThat(result.otherIncomeBreakdown()).isEmpty();
         assertThat(result.pensionHistorySeries()).isEmpty();
     }
@@ -69,7 +69,7 @@ class AnalyticsServiceTest {
         settings.setRetirementDate(LocalDate.of(2030, 12, 31));
         settings.setTargetIncome(30000L);
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.of(settings));
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
 
         AnalyticsDto result = service.getForUser(42L);
@@ -102,7 +102,7 @@ class AnalyticsServiceTest {
         s2.setStatementDate(LocalDate.of(2026, 1, 1));
 
         when(statementRepository.findByPensionIdOrderByStatementDateAsc(1L)).thenReturn(List.of(s1, s2));
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.empty());
 
@@ -127,9 +127,13 @@ class AnalyticsServiceTest {
         stmt.setStatementDate(LocalDate.of(2026, 1, 1));
         when(statementRepository.findByPensionIdOrderByStatementDateAsc(1L)).thenReturn(List.of(stmt));
 
-        StatePension sp = new StatePension();
-        sp.setYearlyAmount(11000L);
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.of(sp));
+        StatePension sp1 = new StatePension();
+        sp1.setName("Mine");
+        sp1.setYearlyAmount(11000L);
+        StatePension sp2 = new StatePension();
+        sp2.setName("Partner");
+        sp2.setYearlyAmount(5000L);
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of(sp1, sp2));
 
         OtherIncome oi = new OtherIncome();
         oi.setName("Rental");
@@ -142,7 +146,10 @@ class AnalyticsServiceTest {
 
         assertThat(result.pensionIncomeBreakdown()).hasSize(1);
         assertThat(result.pensionIncomeBreakdown().get(0).projectedAnnualAmount()).isEqualTo(8000L);
-        assertThat(result.statePensionAnnual()).isEqualTo(11000L);
+        assertThat(result.statePensionBreakdown()).hasSize(2);
+        assertThat(result.statePensionBreakdown().get(0).name()).isEqualTo("Mine");
+        assertThat(result.statePensionBreakdown().get(0).yearlyAmount()).isEqualTo(11000L);
+        assertThat(result.statePensionBreakdown().get(1).yearlyAmount()).isEqualTo(5000L);
         assertThat(result.otherIncomeBreakdown()).hasSize(1);
         assertThat(result.otherIncomeBreakdown().get(0).annualAmount()).isEqualTo(3000L);
     }
@@ -164,7 +171,7 @@ class AnalyticsServiceTest {
         s2.setStatementDate(LocalDate.of(2026, 1, 1));
         when(statementRepository.findByPensionIdOrderByStatementDateAsc(1L)).thenReturn(List.of(s1, s2));
 
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.empty());
 

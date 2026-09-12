@@ -83,11 +83,14 @@ export interface StatePension {
   name: string;
   yearlyAmount: number;
   takesEffectYear: number;
+  notes: string | null;
 }
 
 export interface StatePensionRequest {
+  name: string;
   yearlyAmount: number;
   takesEffectYear: number;
+  notes: string | null;
 }
 
 export interface OtherIncome {
@@ -109,10 +112,12 @@ export interface DashboardDto {
   totalPortfolioValue: number;
   totalProjectedAnnualIncome: number;
   targetIncome: number | null;
-  statePension: {
+  statePensions: {
+    id: number;
+    name: string;
     yearlyAmount: number;
     takesEffectYear: number;
-  } | null;
+  }[];
   otherIncome: {
     id: number;
     name: string;
@@ -128,7 +133,7 @@ export interface AnalyticsDto {
   projections: { year: number; totalValue: number }[];
   pensionGrowthCosts: { name: string; color: string | null; growthValue: number; cumulativeCharges: number }[];
   pensionIncomeBreakdown: { name: string; color: string | null; projectedAnnualAmount: number }[];
-  statePensionAnnual: number;
+  statePensionBreakdown: { name: string; yearlyAmount: number }[];
   otherIncomeBreakdown: { name: string; annualAmount: number }[];
   pensionHistorySeries: {
     name: string;
@@ -173,5 +178,16 @@ export interface OtherIncomeAuditEntry {
   id: number;
   name: string;
   annualAmount: number;
+  notes: string | null;
+}
+
+export interface StatePensionAuditEntry {
+  auditId: number;
+  action: string;
+  auditTimestamp: string;
+  id: number;
+  name: string;
+  yearlyAmount: number;
+  takesEffectYear: number;
   notes: string | null;
 }

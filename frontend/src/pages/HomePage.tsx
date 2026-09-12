@@ -19,12 +19,13 @@ import { PensionFormDialog } from '../components/PensionFormDialog';
 import { OtherIncomeDialog } from '../components/OtherIncomeDialog';
 import { SettingsDialog } from '../components/SettingsDialog';
 import { StatePensionDialog } from '../components/StatePensionDialog';
-import { usePensionAudit, useOtherIncomeAudit } from '../hooks/useAudit';
+import { usePensionAudit, useOtherIncomeAudit, useStatePensionAudit } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOtherIncomeList, useCreateOtherIncome, useUpdateOtherIncome, useDeleteOtherIncome } from '../hooks/useOtherIncome';
 import { useCreatePension, useDeletePension, usePensions, useUpdatePension } from '../hooks/usePensions';
 import { useSettings } from '../hooks/useSettings';
-import type { Pension, PensionRequest, OtherIncome, OtherIncomeRequest, OtherIncomeAuditEntry } from '../types';
+import { useCreateStatePension, useDeleteStatePension, useStatePensionList, useUpdateStatePension } from '../hooks/useStatePension';
+import type { Pension, PensionRequest, OtherIncome, OtherIncomeRequest, OtherIncomeAuditEntry, StatePension, StatePensionAuditEntry, StatePensionRequest } from '../types';
 
 function formatCurrency(value: number | null | undefined): string {
   if (value == null) return '£0';
@@ -53,11 +54,13 @@ export default function HomePage() {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Pension | null>(null);
   const [spDialogVisible, setSpDialogVisible] = useState(false);
+  const [spEditing, setSpEditing] = useState<StatePension | null>(null);
   const [oiDialogVisible, setOiDialogVisible] = useState(false);
   const [oiEditing, setOiEditing] = useState<OtherIncome | null>(null);
   const [settingsDialogVisible, setSettingsDialogVisible] = useState(false);
   const [pensionAuditTarget, setPensionAuditTarget] = useState<Pension | null>(null);
   const [oiAuditTarget, setOiAuditTarget] = useState<OtherIncome | null>(null);
+  const [spAuditTarget, setSpAuditTarget] = useState<StatePension | null>(null);
 
   const { data: settings } = useSettings();
   const auditEnabled = settings?.auditEnabled ?? false;
@@ -70,16 +73,22 @@ export default function HomePage() {
     usePensionAudit(pensionAuditTarget?.pensionId ?? -1, pensionAuditTarget != null && auditEnabled);
   const { data: oiAuditRecords = [], isLoading: oiAuditLoading, isError: oiAuditError, error: oiAuditErr } =
     useOtherIncomeAudit(oiAuditTarget?.id ?? -1, oiAuditTarget != null && auditEnabled);
+  const { data: spAuditRecords = [], isLoading: spAuditLoading, isError: spAuditError, error: spAuditErr } =
+    useStatePensionAudit(spAuditTarget?.id ?? -1, spAuditTarget != null && auditEnabled);
 
   const { data: pensions, isLoading, isError, error } = usePensions();
   const { data: dashboard, isLoading: dashboardLoading, isError: dashboardError, error: dashboardErr } = useDashboard();
   const { data: otherIncomeItems, isLoading: oiLoading, isError: oiError, error: oiErr } = useOtherIncomeList();
+  const { data: statePensionItems, isLoading: spLoading, isError: spError, error: spErr } = useStatePensionList();
   const createPension = useCreatePension();
   const updatePension = useUpdatePension();
   const deletePension = useDeletePension();
   const createOi = useCreateOtherIncome();
   const updateOi = useUpdateOtherIncome();
   const deleteOi = useDeleteOtherIncome();
+  const createSp = useCreateStatePension();
+  const updateSp = useUpdateStatePension();
+  const deleteSp = useDeleteStatePension();
 
   const onLogout = async () => {
     await logout();
@@ -127,7 +136,6 @@ export default function HomePage() {
       <span className="text-secondary">Signed in as {user?.username}</span>
       <Button label="Settings" icon="pi pi-cog" onClick={() => setSettingsDialogVisible(true)} />
       <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
-      <Button label="Manage State Pension" icon="pi pi-briefcase" onClick={() => setSpDialogVisible(true)} />
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
     </div>
   );
@@ -187,6 +195,35 @@ export default function HomePage() {
     </div>
   );
 
+  const handleSpSave = async (request: StatePensionRequest) => {
+    if (spEditing) {
+      await updateSp.mutateAsync({ id: spEditing.id, request });
+    } else {
+      await createSp.mutateAsync(request);
+    }
+    setSpDialogVisible(false);
+  };
+
+  const handleSpDelete = (item: StatePension) => {
+    confirmDialog({
+      message: `Delete "${item.name}"? This cannot be undone.`,
+      header: 'Delete State Pension',
+      acceptLabel: 'Delete',
+      acceptClassName: 'p-button-danger',
+      accept: () => deleteSp.mutate(item.id),
+    });
+  };
+
+  const spActionsBody = (row: StatePension) => (
+    <div className="flex gap-2">
+      <Button icon="pi pi-pencil" severity="secondary" rounded text aria-label="Edit" onClick={() => { setSpEditing(row); setSpDialogVisible(true); }} />
+      <Button icon="pi pi-trash" severity="danger" rounded text aria-label="Delete" onClick={() => handleSpDelete(row)} />
+      {auditEnabled && (
+        <Button icon="pi pi-history" severity="info" rounded text aria-label="Audit History" onClick={() => setSpAuditTarget(row)} />
+      )}
+    </div>
+  );
+
   const countdownDays = dashboard?.retirementDate ? daysUntil(dashboard.retirementDate) : null;
   const incomeProgress = dashboard?.targetIncome && dashboard.targetIncome > 0
     ? Math.min(100, Math.round((dashboard.totalProjectedAnnualIncome / dashboard.targetIncome) * 100))
@@ -230,13 +267,15 @@ export default function HomePage() {
           </div>
           <div className="col-12 md:col-6 lg:col-3">
             <Card title="State Pension &amp; Other Income" className="h-full">
-              {dashboard?.statePension ? (
+              {(dashboard?.statePensions ?? []).length > 0 && (
                 <div className="mb-2">
-                  <div className="font-semibold">{formatCurrency(dashboard.statePension.yearlyAmount)}/yr</div>
-                  <div className="text-sm text-secondary">from {dashboard.statePension.takesEffectYear}</div>
+                  {dashboard!.statePensions.map((sp) => (
+                    <div key={sp.id} className="text-sm">
+                      {sp.name}: {formatCurrency(sp.yearlyAmount)}/yr
+                      {sp.takesEffectYear != null && <span className="text-secondary"> from {sp.takesEffectYear}</span>}
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <div className="text-secondary mb-2">Not configured</div>
               )}
               {(dashboard?.otherIncome ?? []).length > 0 && (
                 <div>
@@ -247,8 +286,8 @@ export default function HomePage() {
                   ))}
                 </div>
               )}
-              {(!dashboard?.statePension && (dashboard?.otherIncome ?? []).length === 0) && (
-                <div className="text-sm text-secondary">No other income set up</div>
+              {((dashboard?.statePensions ?? []).length === 0 && (dashboard?.otherIncome ?? []).length === 0) && (
+                <div className="text-sm text-secondary">No income set up</div>
               )}
             </Card>
           </div>
@@ -309,6 +348,29 @@ export default function HomePage() {
           <Column header="Actions" body={actionsBody} style={{ width: '12rem' }} />
         </DataTable>
 
+        {/* State Pensions Table */}
+        <div className="flex justify-content-between align-items-center mt-5 mb-3">
+          <h2 className="m-0">State Pensions</h2>
+          <Button label="Add State Pension" icon="pi pi-plus" onClick={() => { setSpEditing(null); setSpDialogVisible(true); }} />
+        </div>
+
+        {spError && (
+          <Message severity="error" text={apiErrorMessage(spErr)} className="w-full mb-3" />
+        )}
+
+        <DataTable
+          value={statePensionItems ?? []}
+          loading={spLoading}
+          stripedRows
+          emptyMessage={'No state pensions yet. Click "Add State Pension" to create one.'}
+        >
+          <Column field="name" header="Name" sortable />
+          <Column header="Yearly Amount" body={(row: StatePension) => formatCurrency(row.yearlyAmount)} sortable sortField="yearlyAmount" />
+          <Column field="takesEffectYear" header="Takes Effect" sortable />
+          <Column field="notes" header="Notes" />
+          <Column header="Actions" body={spActionsBody} style={{ width: '10rem' }} />
+        </DataTable>
+
         {/* Other Income Table */}
         <div className="flex justify-content-between align-items-center mt-5 mb-3">
           <h2 className="m-0">Other Income</h2>
@@ -343,7 +405,13 @@ export default function HomePage() {
         onHide={() => setDialogVisible(false)}
         onSave={handleSave}
       />
-      <StatePensionDialog visible={spDialogVisible} onHide={() => setSpDialogVisible(false)} />
+      <StatePensionDialog
+        visible={spDialogVisible}
+        item={spEditing}
+        onHide={() => setSpDialogVisible(false)}
+        onSave={handleSpSave}
+        loading={createSp.isPending || updateSp.isPending}
+      />
       <OtherIncomeDialog
         visible={oiDialogVisible}
         item={oiEditing}
@@ -384,6 +452,23 @@ export default function HomePage() {
             header: 'Annual Amount',
             body: (row) => formatLong((row as OtherIncomeAuditEntry).annualAmount),
           },
+          { field: 'notes', header: 'Notes' },
+        ]}
+      />
+      <AuditDialog
+        visible={spAuditTarget != null}
+        title={spAuditTarget?.name ?? 'State Pension'}
+        records={spAuditRecords}
+        loading={spAuditLoading}
+        error={spAuditError ? spAuditErr : null}
+        onHide={() => setSpAuditTarget(null)}
+        columns={[
+          { field: 'name', header: 'Name' },
+          {
+            header: 'Yearly Amount',
+            body: (row) => formatLong((row as StatePensionAuditEntry).yearlyAmount),
+          },
+          { field: 'takesEffectYear', header: 'Takes Effect' },
           { field: 'notes', header: 'Notes' },
         ]}
       />

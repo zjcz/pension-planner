@@ -88,11 +88,19 @@ class DashboardControllerIntegrationTest {
         Cookie cookie = register("dash_carol", "password123");
         Long userId = getUserId("dash_carol");
 
-        StatePension sp = new StatePension();
-        sp.setUserId(userId);
-        sp.setYearlyAmount(11000L);
-        sp.setTakesEffectYear(2028);
-        statePensionRepository.save(sp);
+        StatePension sp1 = new StatePension();
+        sp1.setUserId(userId);
+        sp1.setName("Mine");
+        sp1.setYearlyAmount(11000L);
+        sp1.setTakesEffectYear(2028);
+        statePensionRepository.save(sp1);
+
+        StatePension sp2 = new StatePension();
+        sp2.setUserId(userId);
+        sp2.setName("Partner");
+        sp2.setYearlyAmount(6000L);
+        sp2.setTakesEffectYear(2030);
+        statePensionRepository.save(sp2);
 
         OtherIncome oi = new OtherIncome();
         oi.setUserId(userId);
@@ -102,8 +110,10 @@ class DashboardControllerIntegrationTest {
 
         mockMvc.perform(get("/api/v1/dashboard").cookie(cookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalProjectedAnnualIncome").value(14000))
-                .andExpect(jsonPath("$.statePension.yearlyAmount").value(11000))
+                .andExpect(jsonPath("$.totalProjectedAnnualIncome").value(20000))
+                .andExpect(jsonPath("$.statePensions.length()").value(2))
+                .andExpect(jsonPath("$.statePensions[0].name").value("Mine"))
+                .andExpect(jsonPath("$.statePensions[1].yearlyAmount").value(6000))
                 .andExpect(jsonPath("$.otherIncome.length()").value(1))
                 .andExpect(jsonPath("$.otherIncome[0].name").value("Freelance"));
     }

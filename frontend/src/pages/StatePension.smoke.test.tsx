@@ -4,46 +4,80 @@ import { describe, expect, it } from 'vitest';
 import HomePage from '../pages/HomePage';
 import { render } from '../test/test-utils';
 
-describe('Phase 5 FE smoke: state pension form loads existing record and saves', () => {
-  it('loads the existing state pension record into the form', async () => {
-    const user = userEvent.setup();
+async function waitForStatePensionTable() {
+  await waitFor(() => {
+    expect(screen.getByText('State Pension')).toBeInTheDocument();
+  });
+}
+
+describe('FE smoke: state pensions table + add/edit/delete flows', () => {
+  it('renders the state pensions table with existing rows', async () => {
     render(<HomePage />);
+    await waitForStatePensionTable();
 
-    await waitFor(() => {
-      expect(screen.getByText('Portfolio Value')).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByRole('button', { name: /Manage State Pension/i }));
-
-    const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Manage State Pension')).toBeInTheDocument();
-
-    expect((within(dialog).getByLabelText(/Yearly Amount \*/i) as HTMLInputElement).value).toBe('11000');
-    expect((within(dialog).getByLabelText(/Takes Effect Year \*/i) as HTMLInputElement).value).toBe('2040');
+    expect(screen.getByText('State Pensions')).toBeInTheDocument();
+    expect(screen.getByText('Partner Pension')).toBeInTheDocument();
+    expect(screen.getByText('£11,000')).toBeInTheDocument();
   });
 
-  it('saves an edited state pension and reflects it in dashboard totals', async () => {
+  it('creates a record via the Add State Pension dialog and shows it in the table', async () => {
     const user = userEvent.setup();
     render(<HomePage />);
+    await waitForStatePensionTable();
 
-    await waitFor(() => {
-      expect(screen.getByText('Portfolio Value')).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByRole('button', { name: /Manage State Pension/i }));
+    await user.click(screen.getByRole('button', { name: /Add State Pension/i }));
 
     const dialog = await screen.findByRole('dialog');
-    const yearlyInput = within(dialog).getByLabelText(/Yearly Amount \*/i);
-    await user.clear(yearlyInput);
-    await user.type(yearlyInput, '12000');
+    expect(within(dialog).getByText('Add State Pension')).toBeInTheDocument();
+
+    await user.type(within(dialog).getByLabelText(/Name \*/i), 'New SP');
+    await user.type(within(dialog).getByLabelText(/Yearly Amount \*/i), '9000');
+    await user.type(within(dialog).getByLabelText(/Takes Effect Year \*/i), '2035');
     await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
 
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByText('New SP')).toBeInTheDocument();
     });
+  });
+
+  it('edits a record via the dialog pre-populated with existing values', async () => {
+    const user = userEvent.setup();
+    render(<HomePage />);
+    await waitForStatePensionTable();
+
+    const row = screen.getByText('State Pension').closest('tr');
+    expect(row).not.toBeNull();
+    await user.click(within(row as HTMLElement).getByRole('button', { name: 'Edit' }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('Edit State Pension')).toBeInTheDocument();
+    const nameInput = within(dialog).getByLabelText(/Name \*/i) as HTMLInputElement;
+    expect(nameInput.value).toBe('State Pension');
+
+    await user.clear(nameInput);
+    await user.type(nameInput, 'My State Pension');
+    await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('£12,000/yr')).toBeInTheDocument();
+      expect(screen.getByText('My State Pension')).toBeInTheDocument();
+    });
+  });
+
+  it('deletes a record via the confirm dialog', async () => {
+    const user = userEvent.setup();
+    render(<HomePage />);
+    await waitForStatePensionTable();
+
+    const row = screen.getByText('Partner Pension').closest('tr');
+    expect(row).not.toBeNull();
+    await user.click(within(row as HTMLElement).getByRole('button', { name: 'Delete' }));
+
+    const confirm = await screen.findByRole('dialog');
+    expect(within(confirm).getByText(/Delete "Partner Pension"\?/)).toBeInTheDocument();
+    await user.click(within(confirm).getByRole('button', { name: 'Delete' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Partner Pension')).not.toBeInTheDocument();
     });
   });
 });

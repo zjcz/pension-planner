@@ -24,3 +24,11 @@ export function useOtherIncomeAudit(id: number, enabled: boolean) {
     enabled,
   });
 }
+
+export function useStatePensionAudit(id: number, enabled: boolean) {
+  return useQuery({
+    queryKey: ['audit', 'statePension', id],
+    queryFn: () => auditApi.forStatePension(id),
+    enabled,
+  });
+}

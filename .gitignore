@@ -5,6 +5,7 @@ backend/src/main/resources/static/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+*.tsbuildinfo
 
 # Local database (docker compose mount)
 data/

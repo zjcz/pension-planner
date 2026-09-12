@@ -7,7 +7,7 @@ import {
   otherIncomeItems,
   pensions,
   settings,
-  statePension,
+  statePensions,
   statements,
   tags,
   user,
@@ -19,11 +19,13 @@ const V1 = '/api/v1';
 let nextPensionId = 3;
 let nextTagId = 3;
 let nextOiId = 3;
+let nextSpId = 3;
 
 export function resetHandlersState() {
   nextPensionId = 3;
   nextTagId = 3;
   nextOiId = 3;
+  nextSpId = 3;
   resetFixtures();
 }
 
@@ -169,18 +171,45 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  http.get(`${V1}/state-pension`, () => HttpResponse.json(statePension)),
-  http.put(`${V1}/state-pension`, async ({ request }) => {
+  http.get(`${V1}/state-pension`, () => HttpResponse.json(statePensions)),
+  http.post(`${V1}/state-pension`, async ({ request }) => {
     const body = (await request.json()) as any;
-    Object.assign(statePension, body);
-    return HttpResponse.json(statePension);
+    const created = {
+      id: nextSpId++,
+      name: body.name,
+      yearlyAmount: body.yearlyAmount,
+      takesEffectYear: body.takesEffectYear,
+      notes: body.notes,
+    };
+    statePensions.unshift(created);
+    return HttpResponse.json(created);
+  }),
+  http.put(`${V1}/state-pension/:id`, async ({ params, request }) => {
+    const id = Number(params.id);
+    const body = (await request.json()) as any;
+    const sp = statePensions.find((s) => s.id === id);
+    if (sp) {
+      Object.assign(sp, {
+        name: body.name,
+        yearlyAmount: body.yearlyAmount,
+        takesEffectYear: body.takesEffectYear,
+        notes: body.notes,
+      });
+    }
+    return HttpResponse.json(sp);
+  }),
+  http.delete(`${V1}/state-pension/:id`, ({ params }) => {
+    const id = Number(params.id);
+    const idx = statePensions.findIndex((s) => s.id === id);
+    if (idx >= 0) statePensions.splice(idx, 1);
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.get(`${V1}/dashboard`, () =>
     HttpResponse.json({
       ...dashboard,
       targetIncome: settings.targetIncome,
-      statePension: { yearlyAmount: statePension.yearlyAmount, takesEffectYear: statePension.takesEffectYear },
+      statePensions: statePensions.map(({ id, name, yearlyAmount, takesEffectYear }) => ({ id, name, yearlyAmount, takesEffectYear })),
       otherIncome: otherIncomeItems.map(({ id, name, annualAmount }) => ({ id, name, annualAmount })),
       retirementDate: settings.retirementDate,
     }),

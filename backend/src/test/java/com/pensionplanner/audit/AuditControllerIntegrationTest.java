@@ -79,6 +79,29 @@ class AuditControllerIntegrationTest {
     }
 
     @Test
+    void statePensionAuditReturnsDescendingAndScopesToUser() throws Exception {
+        Cookie alice = register("audit_sp_alice", "password123");
+        Cookie bob = register("audit_sp_bob", "password123");
+
+        String spId = createStatePension(alice, "State");
+        mockMvc.perform(put("/api/v1/state-pension/" + spId)
+                        .cookie(alice)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"State2\",\"yearlyAmount\":12000,\"takesEffectYear\":2030}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/audit/state-pensions/" + spId).cookie(alice))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].action").value("UPDATE"))
+                .andExpect(jsonPath("$[1].action").value("CREATE"))
+                .andExpect(jsonPath("$[0].yearlyAmount").value(11000));
+
+        mockMvc.perform(get("/api/v1/audit/state-pensions/" + spId).cookie(bob))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void auditViewRejectsOtherUsersRecords() throws Exception {
         Cookie alice = register("audit_owner_alice", "password123");
         Cookie bob = register("audit_other_bob", "password123");
@@ -118,6 +141,15 @@ class AuditControllerIntegrationTest {
                         .cookie(cookie)
                         .contentType(APPLICATION_JSON)
                         .content("{\"name\":\"" + name + "\",\"annualAmount\":60000}"))
+                .andExpect(status().isCreated())
+                .andReturn(), "$.id");
+    }
+
+    private String createStatePension(Cookie cookie, String name) throws Exception {
+        return jsonStringAt(mockMvc.perform(post("/api/v1/state-pension")
+                        .cookie(cookie)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"" + name + "\",\"yearlyAmount\":11000,\"takesEffectYear\":2040}"))
                 .andExpect(status().isCreated())
                 .andReturn(), "$.id");
     }

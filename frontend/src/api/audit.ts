@@ -3,6 +3,7 @@ import type {
   OtherIncomeAuditEntry,
   PensionAuditEntry,
   PensionStatementAuditEntry,
+  StatePensionAuditEntry,
 } from '../types';
 
 export const auditApi = {
@@ -14,4 +15,7 @@ export const auditApi = {
 
   forOtherIncome: (id: number) =>
     http.get<OtherIncomeAuditEntry[]>(`/audit/other-income/${id}`).then((response) => response.data),
+
+  forStatePension: (id: number) =>
+    http.get<StatePensionAuditEntry[]>(`/audit/state-pensions/${id}`).then((response) => response.data),
 };

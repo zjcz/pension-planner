@@ -10,7 +10,7 @@ public record AnalyticsDto(
         List<YearlyProjection> projections,
         List<PensionGrowthCost> pensionGrowthCosts,
         List<PensionIncomeBreakdown> pensionIncomeBreakdown,
-        Long statePensionAnnual,
+        List<StatePensionBreakdown> statePensionBreakdown,
         List<OtherIncomeBreakdown> otherIncomeBreakdown,
         List<PensionHistorySeries> pensionHistorySeries
 ) {
@@ -32,6 +32,12 @@ public record AnalyticsDto(
             String name,
             String color,
             Long projectedAnnualAmount
+    ) {
+    }
+
+    public record StatePensionBreakdown(
+            String name,
+            Long yearlyAmount
     ) {
     }
 

@@ -7,11 +7,13 @@ public record DashboardDto(
         Long totalPortfolioValue,
         Long totalProjectedAnnualIncome,
         Long targetIncome,
-        StatePensionSummary statePension,
+        List<StatePensionSummary> statePensions,
         List<OtherIncomeSummary> otherIncome,
         LocalDate retirementDate
 ) {
     public record StatePensionSummary(
+            Long id,
+            String name,
             Long yearlyAmount,
             Integer takesEffectYear
     ) {

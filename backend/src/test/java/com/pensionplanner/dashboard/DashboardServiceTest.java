@@ -35,7 +35,7 @@ class DashboardServiceTest {
     @Test
     void emptyDataReturnsZeroesAndNulls() {
         when(pensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.empty());
 
@@ -44,7 +44,7 @@ class DashboardServiceTest {
         assertThat(result.totalPortfolioValue()).isEqualTo(0L);
         assertThat(result.totalProjectedAnnualIncome()).isEqualTo(0L);
         assertThat(result.targetIncome()).isNull();
-        assertThat(result.statePension()).isNull();
+        assertThat(result.statePensions()).isEmpty();
         assertThat(result.otherIncome()).isEmpty();
         assertThat(result.retirementDate()).isNull();
     }
@@ -73,7 +73,7 @@ class DashboardServiceTest {
 
         when(statementRepository.findByPensionIdOrderByStatementDateAsc(1L)).thenReturn(List.of(stmt1, stmt2));
         when(statementRepository.findByPensionIdOrderByStatementDateAsc(2L)).thenReturn(List.of());
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.empty());
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
         when(userSettingsRepository.findByUserId(42L)).thenReturn(Optional.empty());
 
@@ -84,13 +84,20 @@ class DashboardServiceTest {
     }
 
     @Test
-    void includesStatePensionAndOtherIncome() {
+    void includesAllStatePensionsAndOtherIncome() {
         when(pensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of());
 
-        StatePension sp = new StatePension();
-        sp.setYearlyAmount(10000L);
-        sp.setTakesEffectYear(2028);
-        when(statePensionRepository.findByUserId(42L)).thenReturn(Optional.of(sp));
+        StatePension sp1 = new StatePension();
+        sp1.setId(1L);
+        sp1.setName("Mine");
+        sp1.setYearlyAmount(10000L);
+        sp1.setTakesEffectYear(2028);
+        StatePension sp2 = new StatePension();
+        sp2.setId(2L);
+        sp2.setName("Partner");
+        sp2.setYearlyAmount(6000L);
+        sp2.setTakesEffectYear(2030);
+        when(statePensionRepository.findByUserIdOrderByNameAsc(42L)).thenReturn(List.of(sp1, sp2));
 
         OtherIncome oi = new OtherIncome();
         oi.setId(1L);
@@ -105,8 +112,10 @@ class DashboardServiceTest {
 
         DashboardDto result = service.getForUser(42L);
 
-        assertThat(result.totalProjectedAnnualIncome()).isEqualTo(15000L);
-        assertThat(result.statePension().yearlyAmount()).isEqualTo(10000L);
+        assertThat(result.totalProjectedAnnualIncome()).isEqualTo(21000L);
+        assertThat(result.statePensions()).hasSize(2);
+        assertThat(result.statePensions().get(0).name()).isEqualTo("Mine");
+        assertThat(result.statePensions().get(1).yearlyAmount()).isEqualTo(6000L);
         assertThat(result.otherIncome()).hasSize(1);
         assertThat(result.targetIncome()).isEqualTo(30000L);
         assertThat(result.retirementDate()).isEqualTo(LocalDate.of(2035, 12, 31));

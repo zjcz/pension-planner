@@ -263,7 +263,7 @@ class AuditServiceTest {
 
         when(pensionRepository.findByUserIdOrderByNameAsc(3L)).thenReturn(List.of(pension));
         when(pensionStatementRepository.findByPensionIdOrderByStatementDateAsc(7L)).thenReturn(List.of(statement));
-        when(statePensionRepository.findByUserId(3L)).thenReturn(Optional.of(statePension));
+        when(statePensionRepository.findByUserIdOrderByNameAsc(3L)).thenReturn(List.of(statePension));
         when(otherIncomeRepository.findByUserIdOrderByNameAsc(3L)).thenReturn(List.of(otherIncome));
 
         auditService.snapshotUserAudits(3L);

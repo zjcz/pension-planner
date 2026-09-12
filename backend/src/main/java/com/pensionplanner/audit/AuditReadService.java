@@ -2,6 +2,7 @@ package com.pensionplanner.audit;
 
 import com.pensionplanner.common.ApiException;
 import com.pensionplanner.income.OtherIncomeRepository;
+import com.pensionplanner.income.StatePensionRepository;
 import com.pensionplanner.pension.PensionRepository;
 import com.pensionplanner.pension.PensionStatementRepository;
 import org.springframework.http.HttpStatus;
@@ -16,22 +17,28 @@ public class AuditReadService {
     private final PensionAuditRepository pensionAuditRepository;
     private final PensionStatementAuditRepository pensionStatementAuditRepository;
     private final OtherIncomeAuditRepository otherIncomeAuditRepository;
+    private final StatePensionAuditRepository statePensionAuditRepository;
     private final PensionRepository pensionRepository;
     private final PensionStatementRepository pensionStatementRepository;
     private final OtherIncomeRepository otherIncomeRepository;
+    private final StatePensionRepository statePensionRepository;
 
     public AuditReadService(PensionAuditRepository pensionAuditRepository,
                             PensionStatementAuditRepository pensionStatementAuditRepository,
                             OtherIncomeAuditRepository otherIncomeAuditRepository,
+                            StatePensionAuditRepository statePensionAuditRepository,
                             PensionRepository pensionRepository,
                             PensionStatementRepository pensionStatementRepository,
-                            OtherIncomeRepository otherIncomeRepository) {
+                            OtherIncomeRepository otherIncomeRepository,
+                            StatePensionRepository statePensionRepository) {
         this.pensionAuditRepository = pensionAuditRepository;
         this.pensionStatementAuditRepository = pensionStatementAuditRepository;
         this.otherIncomeAuditRepository = otherIncomeAuditRepository;
+        this.statePensionAuditRepository = statePensionAuditRepository;
         this.pensionRepository = pensionRepository;
         this.pensionStatementRepository = pensionStatementRepository;
         this.otherIncomeRepository = otherIncomeRepository;
+        this.statePensionRepository = statePensionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +62,13 @@ public class AuditReadService {
                 .stream().map(OtherIncomeAuditDto::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<StatePensionAuditDto> getStatePensionAudit(Long userId, Long id) {
+        verifyStatePension(userId, id);
+        return statePensionAuditRepository.findByIdOrderByAuditTimestampDesc(id)
+                .stream().map(StatePensionAuditDto::from).toList();
+    }
+
     private void verifyPension(Long userId, Long pensionId) {
         pensionRepository.findByPensionIdAndUserId(pensionId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Pension not found"));
@@ -68,5 +82,10 @@ public class AuditReadService {
     private void verifyOtherIncome(Long userId, Long id) {
         otherIncomeRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Other income not found"));
+    }
+
+    private void verifyStatePension(Long userId, Long id) {
+        statePensionRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "State pension not found"));
     }
 }

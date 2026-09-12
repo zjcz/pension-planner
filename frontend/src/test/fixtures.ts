@@ -100,18 +100,31 @@ export const otherIncomeItems: OtherIncome[] = [
   },
 ];
 
-export const statePension: StatePension = {
-  id: 1,
-  name: 'State Pension',
-  yearlyAmount: 11000,
-  takesEffectYear: 2040,
-};
+export const statePensions: StatePension[] = [
+  {
+    id: 1,
+    name: 'State Pension',
+    yearlyAmount: 11000,
+    takesEffectYear: 2040,
+    notes: null,
+  },
+  {
+    id: 2,
+    name: 'Partner Pension',
+    yearlyAmount: 7000,
+    takesEffectYear: 2042,
+    notes: null,
+  },
+];
 
 export const dashboard: DashboardDto = {
   totalPortfolioValue: 28000,
   totalProjectedAnnualIncome: 1350,
   targetIncome: 30000,
-  statePension: { yearlyAmount: 11000, takesEffectYear: 2040 },
+  statePensions: [
+    { id: 1, name: 'State Pension', yearlyAmount: 11000, takesEffectYear: 2040 },
+    { id: 2, name: 'Partner Pension', yearlyAmount: 7000, takesEffectYear: 2042 },
+  ],
   otherIncome: [
     { id: 1, name: 'Rental Income', annualAmount: 6000 },
     { id: 2, name: 'Dividends', annualAmount: 2000 },
@@ -134,7 +147,10 @@ export const analytics: AnalyticsDto = {
   pensionIncomeBreakdown: [
     { name: 'Aviva Workplace', color: '#2196F3', projectedAnnualAmount: 1350 },
   ],
-  statePensionAnnual: 11000,
+  statePensionBreakdown: [
+    { name: 'State Pension', yearlyAmount: 11000 },
+    { name: 'Partner Pension', yearlyAmount: 7000 },
+  ],
   otherIncomeBreakdown: [
     { name: 'Rental Income', annualAmount: 6000 },
     { name: 'Dividends', annualAmount: 2000 },
@@ -163,7 +179,7 @@ const original = {
   pensions: structuredClone(pensions),
   statements: structuredClone(statements),
   otherIncomeItems: structuredClone(otherIncomeItems),
-  statePension: structuredClone(statePension),
+  statePensions: structuredClone(statePensions),
   settings: structuredClone(settings),
   tags: structuredClone(tags),
   dashboard: structuredClone(dashboard),
@@ -174,7 +190,7 @@ export function resetFixtures() {
   pensions.splice(0, pensions.length, ...structuredClone(original.pensions));
   statements.splice(0, statements.length, ...structuredClone(original.statements));
   otherIncomeItems.splice(0, otherIncomeItems.length, ...structuredClone(original.otherIncomeItems));
-  Object.assign(statePension, structuredClone(original.statePension));
+  statePensions.splice(0, statePensions.length, ...structuredClone(original.statePensions));
   Object.assign(settings, structuredClone(original.settings));
   tags.splice(0, tags.length, ...structuredClone(original.tags));
   Object.assign(dashboard, structuredClone(original.dashboard));

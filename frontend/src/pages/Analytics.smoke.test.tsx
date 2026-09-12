@@ -33,7 +33,7 @@ describe('Phase 7 FE smoke: all four charts render with fixture data', () => {
           projections: [],
           pensionGrowthCosts: [],
           pensionIncomeBreakdown: [],
-          statePensionAnnual: 0,
+          statePensionBreakdown: [],
           otherIncomeBreakdown: [],
           pensionHistorySeries: [],
         }),

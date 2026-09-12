@@ -16,7 +16,8 @@ describe('Phase 2 FE smoke: dashboard renders cards and table', () => {
     expect(screen.getByText('Projected Annual Income')).toBeInTheDocument();
     expect(screen.getByText('State Pension & Other Income')).toBeInTheDocument();
     expect(screen.getByText('Retirement Countdown')).toBeInTheDocument();
-    expect(screen.getByText('£11,000/yr')).toBeInTheDocument();
+    expect(screen.getByText(/State Pension: £11,000\/yr/)).toBeInTheDocument();
+    expect(screen.getByText(/Partner Pension: £7,000\/yr/)).toBeInTheDocument();
     expect(screen.getByText(/Rental Income:/)).toBeInTheDocument();
   });
 

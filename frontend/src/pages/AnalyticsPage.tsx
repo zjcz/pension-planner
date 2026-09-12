@@ -127,14 +127,18 @@ export default function AnalyticsPage() {
   // Chart 3: Income vs Target (horizontal bar)
   const incomeBreakdownItems: { label: string; value: number; color: string }[] = [];
   if (data) {
-    data.pensionIncomeBreakdown.forEach((pi, i) => {
-      incomeBreakdownItems.push({ label: pi.name, value: pi.projectedAnnualAmount, color: colorFor(i, pi.color) });
+    let colorIndex = 0;
+    data.pensionIncomeBreakdown.forEach((pi) => {
+      incomeBreakdownItems.push({ label: pi.name, value: pi.projectedAnnualAmount, color: colorFor(colorIndex, pi.color) });
+      colorIndex += 1;
     });
-    if (data.statePensionAnnual > 0) {
-      incomeBreakdownItems.push({ label: 'State Pension', value: data.statePensionAnnual, color: '#7BC043' });
-    }
-    data.otherIncomeBreakdown.forEach((oi, i) => {
-      incomeBreakdownItems.push({ label: oi.name, value: oi.annualAmount, color: FALLBACK[(data!.pensionIncomeBreakdown.length + 1 + i) % FALLBACK.length] });
+    data.statePensionBreakdown.forEach((sp) => {
+      incomeBreakdownItems.push({ label: sp.name, value: sp.yearlyAmount, color: FALLBACK[colorIndex % FALLBACK.length] });
+      colorIndex += 1;
+    });
+    data.otherIncomeBreakdown.forEach((oi) => {
+      incomeBreakdownItems.push({ label: oi.name, value: oi.annualAmount, color: FALLBACK[colorIndex % FALLBACK.length] });
+      colorIndex += 1;
     });
   }
 

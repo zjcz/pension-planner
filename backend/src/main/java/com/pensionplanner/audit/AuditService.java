@@ -145,8 +145,9 @@ public class AuditService {
                 record(statement, ACTION_CREATE);
             }
         }
-        statePensionRepository.findByUserId(userId)
-                .ifPresent(statePension -> record(statePension, ACTION_CREATE));
+        for (StatePension statePension : statePensionRepository.findByUserIdOrderByNameAsc(userId)) {
+            record(statePension, ACTION_CREATE);
+        }
         for (OtherIncome otherIncome : otherIncomeRepository.findByUserIdOrderByNameAsc(userId)) {
             record(otherIncome, ACTION_CREATE);
         }

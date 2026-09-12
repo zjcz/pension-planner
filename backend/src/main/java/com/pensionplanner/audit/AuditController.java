@@ -34,4 +34,9 @@ public class AuditController {
     public List<OtherIncomeAuditDto> otherIncome(@PathVariable Long otherIncomeId) {
         return auditReadService.getOtherIncomeAudit(currentUserService.currentUserId(), otherIncomeId);
     }
+
+    @GetMapping("/state-pensions/{id}")
+    public List<StatePensionAuditDto> statePension(@PathVariable Long id) {
+        return auditReadService.getStatePensionAudit(currentUserService.currentUserId(), id);
+    }
 }
