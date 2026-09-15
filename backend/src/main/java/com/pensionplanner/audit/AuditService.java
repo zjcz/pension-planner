@@ -8,12 +8,19 @@ import com.pensionplanner.pension.Pension;
 import com.pensionplanner.pension.PensionRepository;
 import com.pensionplanner.pension.PensionStatement;
 import com.pensionplanner.pension.PensionStatementRepository;
+import com.pensionplanner.tag.OtherIncomeTag;
+import com.pensionplanner.tag.OtherIncomeTagRepository;
+import com.pensionplanner.tag.PensionTag;
+import com.pensionplanner.tag.PensionTagRepository;
+import com.pensionplanner.tag.Tag;
+import com.pensionplanner.tag.TagRepository;
 import com.pensionplanner.user.UserSettingsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuditService {
@@ -31,6 +38,9 @@ public class AuditService {
     private final PensionStatementRepository pensionStatementRepository;
     private final StatePensionRepository statePensionRepository;
     private final OtherIncomeRepository otherIncomeRepository;
+    private final PensionTagRepository pensionTagRepository;
+    private final OtherIncomeTagRepository otherIncomeTagRepository;
+    private final TagRepository tagRepository;
 
     public AuditService(PensionAuditRepository pensionAuditRepository,
                         PensionStatementAuditRepository pensionStatementAuditRepository,
@@ -40,7 +50,10 @@ public class AuditService {
                         PensionRepository pensionRepository,
                         PensionStatementRepository pensionStatementRepository,
                         StatePensionRepository statePensionRepository,
-                        OtherIncomeRepository otherIncomeRepository) {
+                        OtherIncomeRepository otherIncomeRepository,
+                        PensionTagRepository pensionTagRepository,
+                        OtherIncomeTagRepository otherIncomeTagRepository,
+                        TagRepository tagRepository) {
         this.pensionAuditRepository = pensionAuditRepository;
         this.pensionStatementAuditRepository = pensionStatementAuditRepository;
         this.statePensionAuditRepository = statePensionAuditRepository;
@@ -50,6 +63,9 @@ public class AuditService {
         this.pensionStatementRepository = pensionStatementRepository;
         this.statePensionRepository = statePensionRepository;
         this.otherIncomeRepository = otherIncomeRepository;
+        this.pensionTagRepository = pensionTagRepository;
+        this.otherIncomeTagRepository = otherIncomeTagRepository;
+        this.tagRepository = tagRepository;
     }
 
     @Transactional
@@ -174,6 +190,7 @@ public class AuditService {
         audit.setProviderName(pension.getProviderName());
         audit.setPolicyNumber(pension.getPolicyNumber());
         audit.setWorkplaceName(pension.getWorkplaceName());
+        audit.setTags(pensionTags(pension.getPensionId()));
         pensionAuditRepository.save(audit);
     }
 
@@ -215,6 +232,31 @@ public class AuditService {
         audit.setName(otherIncome.getName());
         audit.setAnnualAmount(otherIncome.getAnnualAmount());
         audit.setNotes(otherIncome.getNotes());
+        audit.setTags(otherIncomeTags(otherIncome.getId()));
         otherIncomeAuditRepository.save(audit);
+    }
+
+    private String pensionTags(Long pensionId) {
+        List<PensionTag> pensionTags = pensionTagRepository.findByPensionId(pensionId);
+        if (pensionTags.isEmpty()) {
+            return null;
+        }
+        return tagRepository.findAllById(pensionTags.stream().map(PensionTag::getTagId).toList())
+                .stream()
+                .map(Tag::getName)
+                .sorted()
+                .collect(Collectors.joining(", "));
+    }
+
+    private String otherIncomeTags(Long otherIncomeId) {
+        List<OtherIncomeTag> otherIncomeTags = otherIncomeTagRepository.findByOtherIncomeId(otherIncomeId);
+        if (otherIncomeTags.isEmpty()) {
+            return null;
+        }
+        return tagRepository.findAllById(otherIncomeTags.stream().map(OtherIncomeTag::getTagId).toList())
+                .stream()
+                .map(Tag::getName)
+                .sorted()
+                .collect(Collectors.joining(", "));
     }
 }

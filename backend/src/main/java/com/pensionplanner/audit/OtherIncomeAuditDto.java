@@ -9,7 +9,8 @@ public record OtherIncomeAuditDto(
         Long id,
         String name,
         Long annualAmount,
-        String notes
+        String notes,
+        String tags
 ) {
 
     public static OtherIncomeAuditDto from(OtherIncomeAudit audit) {
@@ -20,6 +21,7 @@ public record OtherIncomeAuditDto(
                 audit.getId(),
                 audit.getName(),
                 audit.getAnnualAmount(),
-                audit.getNotes());
+                audit.getNotes(),
+                audit.getTags());
     }
 }

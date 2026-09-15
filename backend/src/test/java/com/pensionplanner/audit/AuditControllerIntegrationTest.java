@@ -117,11 +117,33 @@ class AuditControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void auditCapturesTagsForPensionAndOtherIncome() throws Exception {
+        Cookie cookie = register("audit_tags_carol", "password123");
+        String tagIsa = createTag(cookie, "ISA");
+        String tagEmployer = createTag(cookie, "Employer");
+
+        String pensionId = createPension(cookie, "P-tags", "[" + tagIsa + "," + tagEmployer + "]");
+        String oiId = createOtherIncome(cookie, "Rent-tags", "[" + tagIsa + "]");
+
+        mockMvc.perform(get("/api/v1/audit/pensions/" + pensionId).cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].tags").value("Employer, ISA"));
+
+        mockMvc.perform(get("/api/v1/audit/other-income/" + oiId).cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].tags").value("ISA"));
+    }
+
     private String createPension(Cookie cookie, String name) throws Exception {
+        return createPension(cookie, name, "[]");
+    }
+
+    private String createPension(Cookie cookie, String name, String tagIdsJson) throws Exception {
         return jsonStringAt(mockMvc.perform(post("/api/v1/pensions")
                         .cookie(cookie)
                         .contentType(APPLICATION_JSON)
-                        .content("{\"name\":\"" + name + "\",\"maturityDate\":\"2045-08-01\",\"status\":\"ACTIVE\"}"))
+                        .content("{\"name\":\"" + name + "\",\"maturityDate\":\"2045-08-01\",\"status\":\"ACTIVE\",\"tagIds\":" + tagIdsJson + "}"))
                 .andExpect(status().isCreated())
                 .andReturn(), "$.pensionId");
     }
@@ -137,10 +159,23 @@ class AuditControllerIntegrationTest {
     }
 
     private String createOtherIncome(Cookie cookie, String name) throws Exception {
+        return createOtherIncome(cookie, name, "[]");
+    }
+
+    private String createOtherIncome(Cookie cookie, String name, String tagIdsJson) throws Exception {
         return jsonStringAt(mockMvc.perform(post("/api/v1/other-income")
                         .cookie(cookie)
                         .contentType(APPLICATION_JSON)
-                        .content("{\"name\":\"" + name + "\",\"annualAmount\":60000}"))
+                        .content("{\"name\":\"" + name + "\",\"annualAmount\":60000,\"tagIds\":" + tagIdsJson + "}"))
+                .andExpect(status().isCreated())
+                .andReturn(), "$.id");
+    }
+
+    private String createTag(Cookie cookie, String name) throws Exception {
+        return jsonStringAt(mockMvc.perform(post("/api/v1/tags")
+                        .cookie(cookie)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"" + name + "\"}"))
                 .andExpect(status().isCreated())
                 .andReturn(), "$.id");
     }

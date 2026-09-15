@@ -58,6 +58,9 @@ public class PensionAudit {
     @Column(name = "workplaceName")
     private String workplaceName;
 
+    @Column(name = "tags")
+    private String tags;
+
     public Long getAuditId() {
         return auditId;
     }
@@ -168,5 +171,13 @@ public class PensionAudit {
 
     public void setWorkplaceName(String workplaceName) {
         this.workplaceName = workplaceName;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

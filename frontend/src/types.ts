@@ -155,6 +155,7 @@ export interface PensionAuditEntry {
   providerName: string | null;
   policyNumber: string | null;
   workplaceName: string | null;
+  tags: string | null;
 }
 
 export interface PensionStatementAuditEntry {
@@ -179,6 +180,7 @@ export interface OtherIncomeAuditEntry {
   name: string;
   annualAmount: number;
   notes: string | null;
+  tags: string | null;
 }
 
 export interface StatePensionAuditEntry {

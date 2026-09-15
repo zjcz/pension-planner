@@ -15,7 +15,8 @@ public record PensionAuditDto(
         String color,
         String providerName,
         String policyNumber,
-        String workplaceName
+        String workplaceName,
+        String tags
 ) {
 
     public static PensionAuditDto from(PensionAudit audit) {
@@ -31,6 +32,7 @@ public record PensionAuditDto(
                 audit.getColor(),
                 audit.getProviderName(),
                 audit.getPolicyNumber(),
-                audit.getWorkplaceName());
+                audit.getWorkplaceName(),
+                audit.getTags());
     }
 }

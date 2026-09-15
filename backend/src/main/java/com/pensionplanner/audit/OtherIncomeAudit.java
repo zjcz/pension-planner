@@ -39,6 +39,9 @@ public class OtherIncomeAudit {
     @Column(name = "notes")
     private String notes;
 
+    @Column(name = "tags")
+    private String tags;
+
     public Long getAuditId() {
         return auditId;
     }
@@ -101,5 +104,13 @@ public class OtherIncomeAudit {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

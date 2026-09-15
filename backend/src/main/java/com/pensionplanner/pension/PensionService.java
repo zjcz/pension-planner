@@ -77,8 +77,8 @@ public class PensionService {
         if (!statements.isEmpty()) {
             statementRepository.deleteAll(statements);
         }
-        pensionTagRepository.deleteAllInBatch(pensionTagRepository.findByPensionId(pensionId));
         auditService.recordDelete(pension);
+        pensionTagRepository.deleteAllInBatch(pensionTagRepository.findByPensionId(pensionId));
         pensionRepository.delete(pension);
     }
 

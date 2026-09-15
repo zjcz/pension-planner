@@ -436,6 +436,7 @@ export default function HomePage() {
           { field: 'policyNumber', header: 'Policy No.' },
           { field: 'workplaceName', header: 'Workplace' },
           { field: 'color', header: 'Colour' },
+          { field: 'tags', header: 'Tags' },
           { field: 'notes', header: 'Notes' },
         ]}
       />
@@ -452,6 +453,7 @@ export default function HomePage() {
             header: 'Annual Amount',
             body: (row) => formatLong((row as OtherIncomeAuditEntry).annualAmount),
           },
+          { field: 'tags', header: 'Tags' },
           { field: 'notes', header: 'Notes' },
         ]}
       />

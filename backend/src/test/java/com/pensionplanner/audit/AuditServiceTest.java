@@ -9,6 +9,12 @@ import com.pensionplanner.pension.PensionRepository;
 import com.pensionplanner.pension.PensionStatus;
 import com.pensionplanner.pension.PensionStatement;
 import com.pensionplanner.pension.PensionStatementRepository;
+import com.pensionplanner.tag.OtherIncomeTag;
+import com.pensionplanner.tag.OtherIncomeTagRepository;
+import com.pensionplanner.tag.PensionTag;
+import com.pensionplanner.tag.PensionTagRepository;
+import com.pensionplanner.tag.Tag;
+import com.pensionplanner.tag.TagRepository;
 import com.pensionplanner.user.UserSettings;
 import com.pensionplanner.user.UserSettingsRepository;
 import org.junit.jupiter.api.Test;
@@ -35,11 +41,15 @@ class AuditServiceTest {
     private final PensionStatementRepository pensionStatementRepository = mock(PensionStatementRepository.class);
     private final StatePensionRepository statePensionRepository = mock(StatePensionRepository.class);
     private final OtherIncomeRepository otherIncomeRepository = mock(OtherIncomeRepository.class);
+    private final PensionTagRepository pensionTagRepository = mock(PensionTagRepository.class);
+    private final OtherIncomeTagRepository otherIncomeTagRepository = mock(OtherIncomeTagRepository.class);
+    private final TagRepository tagRepository = mock(TagRepository.class);
 
     private final AuditService auditService = new AuditService(
             pensionAuditRepository, statementAuditRepository, statePensionAuditRepository,
             otherIncomeAuditRepository, userSettingsRepository, pensionRepository,
-            pensionStatementRepository, statePensionRepository, otherIncomeRepository);
+            pensionStatementRepository, statePensionRepository, otherIncomeRepository,
+            pensionTagRepository, otherIncomeTagRepository, tagRepository);
 
     private void enableAudit(Long userId) {
         UserSettings settings = new UserSettings();
@@ -67,6 +77,15 @@ class AuditServiceTest {
         pension.setStatusDate(LocalDate.of(2026, 1, 1));
         pension.setColor("#FF5733");
 
+        PensionTag pensionTag = new PensionTag();
+        pensionTag.setPensionId(7L);
+        pensionTag.setTagId(1L);
+        when(pensionTagRepository.findByPensionId(7L)).thenReturn(List.of(pensionTag));
+        Tag tag = new Tag();
+        tag.setId(1L);
+        tag.setName("ISA");
+        when(tagRepository.findAllById(List.of(1L))).thenReturn(List.of(tag));
+
         enableAudit(3L);
         auditService.recordCreate(pension);
 
@@ -82,6 +101,7 @@ class AuditServiceTest {
         assertThat(audit.getStatus()).isEqualTo("ACTIVE");
         assertThat(audit.getStatusDate()).isEqualTo(LocalDate.of(2026, 1, 1));
         assertThat(audit.getColor()).isEqualTo("#FF5733");
+        assertThat(audit.getTags()).isEqualTo("ISA");
         assertThat(audit.getAuditTimestamp()).isNotNull();
     }
 
@@ -166,6 +186,15 @@ class AuditServiceTest {
         otherIncome.setName("Rental");
         otherIncome.setAnnualAmount(600000L);
 
+        OtherIncomeTag otherIncomeTag = new OtherIncomeTag();
+        otherIncomeTag.setOtherIncomeId(4L);
+        otherIncomeTag.setTagId(2L);
+        when(otherIncomeTagRepository.findByOtherIncomeId(4L)).thenReturn(List.of(otherIncomeTag));
+        Tag tag = new Tag();
+        tag.setId(2L);
+        tag.setName("Property");
+        when(tagRepository.findAllById(List.of(2L))).thenReturn(List.of(tag));
+
         enableAudit(3L);
         auditService.recordDelete(otherIncome);
 
@@ -175,6 +204,7 @@ class AuditServiceTest {
         assertThat(audit.getAction()).isEqualTo(AuditService.ACTION_DELETE);
         assertThat(audit.getName()).isEqualTo("Rental");
         assertThat(audit.getAnnualAmount()).isEqualTo(600000L);
+        assertThat(audit.getTags()).isEqualTo("Property");
     }
 
     @Test

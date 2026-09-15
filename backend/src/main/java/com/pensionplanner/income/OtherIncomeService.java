@@ -66,8 +66,8 @@ public class OtherIncomeService {
     @Transactional
     public void delete(Long userId, Long id) {
         OtherIncome otherIncome = getForUser(userId, id);
-        otherIncomeTagRepository.deleteAllInBatch(otherIncomeTagRepository.findByOtherIncomeId(id));
         auditService.recordDelete(otherIncome);
+        otherIncomeTagRepository.deleteAllInBatch(otherIncomeTagRepository.findByOtherIncomeId(id));
         otherIncomeRepository.delete(otherIncome);
     }
 
