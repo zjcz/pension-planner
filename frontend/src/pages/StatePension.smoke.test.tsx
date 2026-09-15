@@ -33,7 +33,7 @@ describe('FE smoke: state pensions table + add/edit/delete flows', () => {
     await user.type(within(dialog).getByLabelText(/Name \*/i), 'New SP');
     await user.type(within(dialog).getByLabelText(/Yearly Amount \*/i), '9000');
     await user.type(within(dialog).getByLabelText(/Takes Effect Year \*/i), '2035');
-    await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
+    await user.click(within(dialog).getByRole('button', { name: /^Create$/i }));
 
     await waitFor(() => {
       expect(screen.getByText('New SP')).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe('FE smoke: state pensions table + add/edit/delete flows', () => {
 
     await user.clear(nameInput);
     await user.type(nameInput, 'My State Pension');
-    await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
+    await user.click(within(dialog).getByRole('button', { name: /^Save Changes$/i }));
 
     await waitFor(() => {
       expect(screen.getByText('My State Pension')).toBeInTheDocument();

@@ -59,7 +59,7 @@ describe('Phase 9 FE smoke: tag creation and assignment in pension/income dialog
     await user.click(tagsControl);
     await user.click(within(dialog).getByText('ISA'));
 
-    await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
+    await user.click(within(dialog).getByRole('button', { name: /^Create$/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Freelance Work')).toBeInTheDocument();
