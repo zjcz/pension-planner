@@ -11,7 +11,7 @@ A web application for planning and tracking pensions. It currently provides a lo
 ```
 pension-planner/
 ├── backend/                  Spring Boot application (Maven)
-│   └── src/main/java/com/pensionplanner/
+│   └── src/main/java/dev/jonclarke/pensionplanner/
 │       ├── auth/             Login, registration, JWT issuance
 │       ├── security/         JWT filter, current-user resolution
 │       ├── user/             User entity, profile settings API
@@ -113,7 +113,7 @@ Security hardening baked in: every response carries `Content-Security-Policy` (`
 
 The backend compiles to a native executable via the GraalVM `native` Maven profile (`mvn -Pnative -DskipTests native:compile`, run from `backend/` with a GraalVM for JDK 25 on `PATH`/`JAVA_HOME`). This produces a single `backend/target/pension-planner` ELF binary (~150 MB) that starts in ~0.4 s with no JVM.
 
-The profile uses `native-maven-plugin` (configuration in `backend/pom.xml`) with the GraalVM reachability metadata repository enabled and `fallback=false`. Runtime hints for reflection/JNI are provided by `NativeRuntimeHints` (`com.pensionplanner.config`) and wired via `@ImportRuntimeHints` on `PensionPlannerApplication`. They cover:
+The profile uses `native-maven-plugin` (configuration in `backend/pom.xml`) with the GraalVM reachability metadata repository enabled and `fallback=false`. Runtime hints for reflection/JNI are provided by `NativeRuntimeHints` (`dev.jonclarke.pensionplanner.config`) and wired via `@ImportRuntimeHints` on `PensionPlannerApplication`. They cover:
 
 - **JJWT** (`io.jsonwebtoken.*`): the impl/factory classes (`KeysBridge`, `DefaultJwtBuilder`, `DefaultJwtParserBuilder`, claims/header builders, `Standard*Algorithms`/`JwksBridge`, …) that JJWT loads reflectively.
 - **SQLite / Flyway / Hibernate**: `META-INF/services/java.sql.Driver` (driver ServiceLoader), the `org/sqlite/native/Linux/*/libsqlitejdbc.so` JNI library (extracted to a temp file at runtime), the `org.sqlite.JDBC` driver class, and the `org.hibernate.community.dialect.SQLiteDialect` (loaded by `Class.forName` from `spring.jpa.properties.hibernate.dialect`).

@@ -44,7 +44,7 @@ Target: Self-hosted / Docker, single container (Spring Boot serving REST + compi
 pension-planner/
 ├── backend/
 │   ├── pom.xml
-│   └── src/main/java/... (com.pensionplanner)
+│   └── src/main/java/... (dev.jonclarke.pensionplanner)
 │   └── src/main/resources/
 │       ├── application.yml
 │       └── db/migration/V1__init.sql ...

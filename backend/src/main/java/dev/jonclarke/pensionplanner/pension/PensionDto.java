@@ -1,0 +1,36 @@
+package dev.jonclarke.pensionplanner.pension;
+
+import dev.jonclarke.pensionplanner.tag.TagDto;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public record PensionDto(
+        Long pensionId,
+        String name,
+        LocalDate maturityDate,
+        String notes,
+        PensionStatus status,
+        LocalDate statusDate,
+        String color,
+        List<TagDto> tags,
+        String providerName,
+        String policyNumber,
+        String workplaceName
+) {
+
+    public static PensionDto from(Pension pension, List<TagDto> tags) {
+        return new PensionDto(
+                pension.getPensionId(),
+                pension.getName(),
+                pension.getMaturityDate(),
+                pension.getNotes(),
+                pension.getStatus(),
+                pension.getStatusDate(),
+                pension.getColor(),
+                tags,
+                pension.getProviderName(),
+                pension.getPolicyNumber(),
+                pension.getWorkplaceName());
+    }
+}

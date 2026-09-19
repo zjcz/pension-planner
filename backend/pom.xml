@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.pensionplanner</groupId>
+    <groupId>dev.jonclarke.pensionplanner</groupId>
     <artifactId>pension-planner-backend</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>pension-planner-backend</name>
@@ -105,7 +105,7 @@
                         <version>0.10.6</version>
                         <configuration>
                             <imageName>pension-planner</imageName>
-                            <mainClass>com.pensionplanner.PensionPlannerApplication</mainClass>
+                            <mainClass>dev.jonclarke.pensionplanner.PensionPlannerApplication</mainClass>
                             <fallback>false</fallback>
                             <metadataRepository>
                                 <enabled>true</enabled>
