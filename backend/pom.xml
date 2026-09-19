@@ -13,7 +13,7 @@
 
     <groupId>dev.jonclarke.pensionplanner</groupId>
     <artifactId>pension-planner-backend</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>pension-planner-backend</name>
     <description>Pension Planner backend</description>
 
