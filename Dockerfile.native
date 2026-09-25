@@ -15,11 +15,11 @@ RUN curl -sSL https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven
     && ln -s /opt/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/local/bin/mvn
 WORKDIR /build/backend
 COPY backend/pom.xml ./
-RUN mvn -q -DskipTests dependency:go-offline
+RUN mvn -DskipTests dependency:go-offline
 COPY backend/ ./
 COPY --from=frontend-build /build/frontend/dist ./src/main/resources/static
 # -J-Xmx4g caps the native-image heap for constrained CI/docker build runners.
-RUN mvn -q -Pnative -DskipTests -Dnative-image.build-args=-J-Xmx4g native:compile
+RUN mvn -Pnative -DskipTests -Dnative-image.build-args=-J-Xmx4g native:compile
 
 # ---- Stage 3: runtime image (glibc only; no JVM needed) ----
 FROM debian:bookworm-slim
