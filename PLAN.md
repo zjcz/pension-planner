@@ -33,7 +33,7 @@ Target: Self-hosted / Docker, single container (Spring Boot serving REST + compi
 
 - **Backend**: Spring Boot 3.3+ (Spring Web, Spring Security, Spring Data JPA or JDBC, Hibernate).
   Entity listeners (e.g. `@PrePersist/@PreUpdate` or a dedicated audit interceptor) implement audit snapshots.
-- **Frontend**: React + Vite + PrimeReact (Calendar, DataTable, Dialog, Toolbar, Chart), PrimeFlex grid, PrimeIcons.
+- **Frontend**: React + Vite + PrimeReact (Calendar, DataTable, Dialog, Toolbar, Chart), Tailwind CSS, PrimeIcons.
 - **Auth**: HTTP-only `SameSite=Lax` JWT cookies. Password hashing via BCrypt/Argon2. OIDC-ready design (stateless JWT filter).
 - **Multi-tenancy**: `userId` FK on every table; SecurityContext supplies the user; all repository queries scoped by `userId`.
 - **DB**: `sqlite-jdbc` (or a community SQLite dialect for Hibernate). Schema managed by Flyway for repeatable migrations.
@@ -104,7 +104,7 @@ Every table carries `userId`. Audits are point-in-time snapshots with `action` (
 - [x] `GET /api/v1/settings` + `PUT /api/v1/settings` for `UserSettings` (targetIncome, retirementDate).
 
 ### Frontend
-- [x] Vite + React + TypeScript + PrimeReact setup; PrimeFlex grid; theme import.
+- [x] Vite + React + TypeScript + PrimeReact setup; Tailwind CSS grid; theme import.
 - [x] Axios client with cookie credentials.
 - [x] React Query `QueryClientProvider`.
 - [x] Routes: `/login`, `/register` (hidden when `ALLOW_REGISTRATION=false` — exposed via `GET /api/v1/auth/config`), protected-route guard.

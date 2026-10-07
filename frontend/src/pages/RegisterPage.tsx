@@ -32,10 +32,10 @@ export default function RegisterPage() {
 
   if (config && !config.allowRegistration) {
     return (
-      <div className="flex align-items-center justify-content-center min-h-screen">
-        <div className="card p-4 text-center" style={{ width: '28rem' }}>
-          <h2 className="m-0">Pension Planner</h2>
-          <p className="mt-3">Registration is currently disabled by the administrator.</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-surface rounded-card shadow-card p-6 text-center" style={{ width: '28rem' }}>
+          <h2 className="m-0 text-2xl font-bold">Pension Planner</h2>
+          <p className="mt-4 mb-3.5">Registration is currently disabled by the administrator.</p>
           <Link to="/login">Back to Sign In</Link>
         </div>
       </div>
@@ -61,15 +61,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex align-items-center justify-content-center min-h-screen">
-      <div className="card p-4" style={{ width: '28rem' }}>
-        <div className="text-center mb-4">
-          <h2 className="m-0">Pension Planner</h2>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-surface rounded-card shadow-card p-6" style={{ width: '28rem' }}>
+        <div className="text-center mb-6">
+          <h2 className="m-0 text-2xl font-bold">Pension Planner</h2>
           <span className="text-secondary text-sm">Create your account</span>
         </div>
 
-        <form onSubmit={onSubmit} className="flex flex-column gap-3">
-          <div className="flex flex-column gap-2">
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <label htmlFor="username">Username</label>
             <InputText
               id="username"
@@ -81,7 +81,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="flex flex-column gap-2">
+          <div className="flex flex-col gap-2">
             <label htmlFor="password">Password</label>
             <Password
               id="password"
@@ -96,7 +96,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="flex flex-column gap-2">
+          <div className="flex flex-col gap-2">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <Password
               id="confirmPassword"
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           <Button type="submit" label="Create Account" icon="pi pi-user-plus" loading={submitting} />
         </form>
 
-        <div className="mt-3 text-center">
+        <div className="mt-4 text-center">
           <span className="text-secondary text-sm">Already have an account? </span>
           <Link to="/login">Sign In</Link>
         </div>

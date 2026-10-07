@@ -2,7 +2,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 
 export function PageLoading() {
   return (
-    <div className="flex flex-column align-items-center justify-content-center p-6 gap-3">
+    <div className="flex flex-col items-center justify-center p-12 gap-4">
       <ProgressSpinner />
       <span className="text-secondary">Loading...</span>
     </div>

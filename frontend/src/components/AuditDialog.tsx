@@ -98,7 +98,7 @@ export function AuditDialog<T>({ visible, title, records, columns, loading, erro
           ))}
         </DataTable>
       )}
-      <p className="text-secondary text-sm mt-3 mb-0">
+      <p className="text-secondary text-sm mt-4 mb-0">
         Audit records are read-only and cannot be edited or deleted.
       </p>
     </Dialog>

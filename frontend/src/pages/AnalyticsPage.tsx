@@ -29,14 +29,14 @@ export default function AnalyticsPage() {
   };
 
   const start = (
-    <div className="flex align-items-center gap-2">
+    <div className="flex items-center gap-2">
       <Button icon="pi pi-arrow-left" severity="secondary" text onClick={() => navigate('/')} aria-label="Back" />
       <span className="font-bold">Analytics</span>
     </div>
   );
 
   const end = (
-    <div className="flex align-items-center gap-3">
+    <div className="flex items-center gap-4">
       <span className="text-secondary">Signed in as {user?.username}</span>
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
     </div>
@@ -203,52 +203,52 @@ export default function AnalyticsPage() {
   return (
     <div>
       <Toolbar start={start} end={end} />
-      <div className="p-4">
+      <div className="p-6">
         {/* Growth Projection */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Growth Projection</h3>
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Growth Projection</h3>
           {projectionData ? (
             <div style={{ height: '300px' }}>
               <Chart type="line" data={projectionData} options={projectionOpts} style={{ height: '100%' }} />
             </div>
           ) : (
-            <p className="text-secondary">Add statements and a retirement date to see projections.</p>
+            <p className="my-3.5 text-secondary">Add statements and a retirement date to see projections.</p>
           )}
         </div>
 
         {/* Growth vs Cost */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Growth vs. Charges</h3>
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Growth vs. Charges</h3>
           {growthCostData ? (
             <div style={{ height: '300px' }}>
               <Chart type="bar" data={growthCostData} options={growthCostOpts} style={{ height: '100%' }} />
             </div>
           ) : (
-            <p className="text-secondary">Add statements with paid-in amounts and charges to see this chart.</p>
+            <p className="my-3.5 text-secondary">Add statements with paid-in amounts and charges to see this chart.</p>
           )}
         </div>
 
         {/* Income vs Target */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Projected Income Breakdown</h3>
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Projected Income Breakdown</h3>
           {incomeData ? (
             <div style={{ height: `${Math.max(150, incomeBreakdownItems.length * 50)}px` }}>
               <Chart type="bar" data={incomeData} options={incomeOpts} style={{ height: '100%' }} />
             </div>
           ) : (
-            <p className="text-secondary">No income sources configured yet.</p>
+            <p className="my-3.5 text-secondary">No income sources configured yet.</p>
           )}
         </div>
 
         {/* Historical Portfolio Trend */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Historical Portfolio Trend</h3>
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Historical Portfolio Trend</h3>
           {historyData ? (
             <div style={{ height: '300px' }}>
               <Chart type="line" data={historyData} options={historyOpts} style={{ height: '100%' }} />
             </div>
           ) : (
-            <p className="text-secondary">Add multiple statements to see the trend over time.</p>
+            <p className="my-3.5 text-secondary">Add multiple statements to see the trend over time.</p>
           )}
         </div>
       </div>

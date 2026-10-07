@@ -84,7 +84,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
   };
 
   const footer = (
-    <div className="flex justify-content-end gap-2">
+    <div className="flex justify-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
       <Button label={statement ? 'Save Changes' : 'Create'} icon="pi pi-check" onClick={submit} loading={submitting} />
     </div>
@@ -99,8 +99,8 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
       footer={footer}
       modal
     >
-      <div className="flex flex-column gap-3">
-        <div className="flex flex-column gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-date">Statement Date *</label>
           <Calendar
             id="stmt-date"
@@ -114,7 +114,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-plan-value">Plan Value *</label>
           <InputNumber
             id="stmt-plan-value"
@@ -128,7 +128,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-projected">Projected Annual Amount *</label>
           <InputNumber
             id="stmt-projected"
@@ -142,7 +142,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-charges">Yearly Charges</label>
           <InputNumber
             id="stmt-charges"
@@ -156,7 +156,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-transfer">Transfer Value</label>
           <InputNumber
             id="stmt-transfer"
@@ -170,7 +170,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-paid-in">Amount Paid In</label>
           <InputNumber
             id="stmt-paid-in"
@@ -184,7 +184,7 @@ export function StatementFormDialog({ visible, statement, onHide, onSave }: Stat
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="stmt-notes">Notes</label>
           <InputTextarea
             id="stmt-notes"

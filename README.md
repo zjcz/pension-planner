@@ -229,7 +229,7 @@ docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
 | @tanstack/react-query | Server-state management: caches API data, handles loading/error states, and keeps the auth user in sync. |
 | axios | HTTP client used by `src/api/` to call the backend API with credentials (cookies). |
 | primereact | PrimeReact UI component library (buttons, inputs, toolbar, password fields) for a consistent look. |
-| primeflex | Utility-first CSS framework (flexbox/grid helpers like `flex flex-column gap-3`) used for layout. |
+| tailwindcss | Utility-first CSS framework (layout/spacing helpers like `flex flex-col gap-4`) used for layout; PrimeReact's lara theme tokens are bridged into Tailwind namespaces in `src/index.css`. |
 | primeicons | Icon set used alongside PrimeReact components. |
 | vite + @vitejs/plugin-react | Dev server with hot module replacement and the production bundler; the plugin adds React fast refresh. |
 | typescript | Static typing for the frontend codebase, enforced via `tsc` in the build. |

@@ -85,7 +85,7 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
   };
 
   const footer = (
-    <div className="flex justify-content-end gap-2">
+    <div className="flex justify-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
       <Button label={item ? 'Save Changes' : 'Create'} icon="pi pi-check" onClick={handleSave} loading={loading} />
     </div>
@@ -101,8 +101,8 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
       modal
     >
       <Toast ref={toast} position="top-right" />
-      <div className="flex flex-column gap-3">
-        <div className="flex flex-column gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <label htmlFor="oi-name">Name *</label>
           <InputText
             id="oi-name"
@@ -112,7 +112,7 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
             autoFocus
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="oi-annualAmount">Annual Amount *</label>
           <InputNumber
             id="oi-annualAmount"
@@ -126,7 +126,7 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
             className="w-full"
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="oi-tags">Tags</label>
           <MultiSelect
             id="oi-tags"
@@ -140,8 +140,8 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
             showClear
             panelFooterTemplate={
               tagFilter.trim() && !exactMatch ? (
-                <div className="flex justify-content-between align-items-center px-3 py-2 border-top-1 border-300">
-                  <span className="text-sm text-500">
+                <div className="flex justify-between items-center px-4 py-2 border-t border-surface-300">
+                  <span className="text-sm text-surface-500">
                     Create "<strong>{tagFilter.trim()}</strong>" as new tag
                   </span>
                   <Button
@@ -157,7 +157,7 @@ export function OtherIncomeDialog({ visible, item, onHide, onSave, loading }: Ot
             }
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="oi-notes">Notes</label>
           <InputTextarea
             id="oi-notes"

@@ -1,3 +1,29 @@
+/* Declared before the @import (legal per the cascade-layers spec) so this
+   statement establishes the layer order first. PrimeReact's theme ships its
+   component CSS inside `@layer primereact`; without this line it would claim
+   the first slot and Tailwind's preflight (`base`) would outrank it, wiping
+   component padding/borders. Desired: preflight < primereact < utilities. */
+@layer theme, base, primereact, components, utilities;
+
+@import 'tailwindcss';
+
+@theme {
+  --text-title: 1.75rem;
+  --shadow-card:
+    0 3px 5px rgb(0 0 0 / 0.02), 0 0 2px rgb(0 0 0 / 0.05), 0 1px 4px rgb(0 0 0 / 0.08);
+}
+
+/* Bridge PrimeReact's lara theme tokens into Tailwind's colour namespaces. */
+@theme inline {
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--text-color-secondary);
+  --color-surface: var(--surface-card);
+  --color-surface-300: var(--surface-300);
+  --color-surface-500: var(--surface-500);
+  --color-divider: var(--surface-border);
+  --radius-card: var(--border-radius);
+}
+
 html {
   font-size: 14px;
 }

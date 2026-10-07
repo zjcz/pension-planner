@@ -117,7 +117,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
   };
 
   const footer = (
-    <div className="flex justify-content-end gap-2">
+    <div className="flex justify-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
       <Button label="Save" icon="pi pi-check" onClick={handleSaveSettings} loading={updateSettings.isPending} />
     </div>
@@ -134,12 +134,12 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
     >
       <ConfirmDialog />
       {settingsLoading ? (
-        <p className="text-secondary">Loading...</p>
+        <p className="my-3.5 text-secondary">Loading...</p>
       ) : settingsError ? (
         <Message severity="error" text={apiErrorMessage(settingsErr)} className="w-full" />
       ) : (
-        <div className="flex flex-column gap-4">
-          <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
             <label htmlFor="targetIncome">Target Annual Income</label>
             <InputNumber
               id="targetIncome"
@@ -155,7 +155,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
             <small className="text-secondary">The annual income you aim to have in retirement.</small>
           </div>
 
-          <div className="flex flex-column gap-2">
+          <div className="flex flex-col gap-2">
             <label htmlFor="retirementDate">Retirement Date</label>
             <Calendar
               id="retirementDate"
@@ -171,7 +171,7 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
             <small className="text-secondary">When you plan to retire.</small>
           </div>
 
-          <div className="flex align-items-center gap-3">
+          <div className="flex items-center gap-4">
             <InputSwitch
               id="auditEnabled"
               checked={auditEnabled}
@@ -185,20 +185,20 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
 
           {formError && <Message severity="error" text={formError} />}
 
-          <hr className="m-0 border-100" />
+          <hr className="m-0 border-divider" />
 
-          <div className="flex flex-column gap-2">
+          <div className="flex flex-col gap-2">
             <label className="font-semibold">Tags</label>
             <small className="text-secondary">Labels you can assign to pensions and other income.</small>
 
             {tagsLoading ? (
-              <p className="text-secondary text-sm">Loading tags...</p>
+              <p className="my-3.5 text-secondary text-sm">Loading tags...</p>
             ) : tags.length === 0 ? (
-              <p className="text-secondary text-sm">No tags yet. Create one below.</p>
+              <p className="my-3.5 text-secondary text-sm">No tags yet. Create one below.</p>
             ) : (
-              <div className="flex flex-column gap-1">
+              <div className="flex flex-col gap-1">
                 {tags.map((tag) => (
-                  <div key={tag.id} className="flex align-items-center gap-2">
+                  <div key={tag.id} className="flex items-center gap-2">
                     {editingTagId === tag.id ? (
                       <>
                         <InputText

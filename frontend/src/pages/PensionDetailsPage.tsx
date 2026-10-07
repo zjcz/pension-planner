@@ -137,14 +137,14 @@ export default function PensionDetailsPage() {
   };
 
   const start = (
-    <div className="flex align-items-center gap-2">
+    <div className="flex items-center gap-2">
       <Button icon="pi pi-arrow-left" severity="secondary" text onClick={() => navigate('/')} aria-label="Back" />
       <span className="font-bold">{pension?.name ?? 'Pension Details'}</span>
     </div>
   );
 
   const end = (
-    <div className="flex align-items-center gap-3">
+    <div className="flex items-center gap-4">
       <span className="text-secondary">Signed in as {user?.username}</span>
       <Button label="Add Statement" icon="pi pi-plus" onClick={openCreate} />
       <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
@@ -187,33 +187,33 @@ export default function PensionDetailsPage() {
     <div>
       <Toolbar start={start} end={end} />
 
-      <div className="p-4">
-        {stmtError && <Message severity="error" text={apiErrorMessage(stmtErr)} className="w-full mb-3" />}
+      <div className="p-6">
+        {stmtError && <Message severity="error" text={apiErrorMessage(stmtErr)} className="w-full mb-4" />}
 
         {/* Overview Panel */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Overview</h3>
-          <div className="grid">
-            <div className="col-12 md:col-6 lg:col-3">
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Overview</h3>
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Name</div>
               <div className="font-medium">{pension?.name}</div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Maturity</div>
               <div className="font-medium">{formatDate(pension?.maturityDate ?? null)}</div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Status</div>
               <div>
                 <Tag value={pension?.status} severity={pension?.status === 'ACTIVE' ? 'success' : 'secondary'} />
               </div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Colour</div>
-              <div className="flex align-items-center gap-2">
+              <div className="flex items-center gap-2">
                 {pension?.color ? (
                   <span
-                    className="inline-block border-circle"
+                    className="inline-block rounded-full"
                     style={{ width: '1.25rem', height: '1.25rem', backgroundColor: pension.color, border: '1px solid var(--surface-border)' }}
                     title={pension.color}
                   />
@@ -222,19 +222,19 @@ export default function PensionDetailsPage() {
                 )}
               </div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Provider</div>
               <div className="font-medium">{pension?.providerName || '—'}</div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Policy Number</div>
               <div className="font-medium">{pension?.policyNumber || '—'}</div>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-span-12 md:col-span-6 lg:col-span-3">
               <div className="text-sm text-secondary mb-1">Workplace</div>
               <div className="font-medium">{pension?.workplaceName || '—'}</div>
             </div>
-            <div className="col-12 md:col-6 lg:col-9">
+            <div className="col-span-12 md:col-span-6 lg:col-span-9">
               <div className="text-sm text-secondary mb-1">Notes</div>
               <div className="font-medium">{pension?.notes || '—'}</div>
             </div>
@@ -242,20 +242,20 @@ export default function PensionDetailsPage() {
         </div>
 
         {/* Performance Chart */}
-        <div className="surface-card border-round shadow-1 p-4 mb-4">
-          <h3 className="mt-0 mb-3">Performance</h3>
+        <div className="bg-surface rounded-card shadow-card p-6 mb-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Performance</h3>
           {chartData ? (
             <div style={{ height: '300px' }}>
               <Chart type="bar" data={chartData} options={chartOptions} style={{ height: '100%' }} />
             </div>
           ) : (
-            <p className="text-secondary">No statements yet. Add a statement to see performance.</p>
+            <p className="my-3.5 text-secondary">No statements yet. Add a statement to see performance.</p>
           )}
         </div>
 
         {/* Statements Table */}
-        <div className="surface-card border-round shadow-1 p-4">
-          <h3 className="mt-0 mb-3">Statements</h3>
+        <div className="bg-surface rounded-card shadow-card p-6">
+          <h3 className="mt-0 mb-4 text-lg font-bold">Statements</h3>
           <DataTable
             value={statements ?? []}
             loading={stmtLoading}
