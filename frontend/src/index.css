@@ -34,3 +34,14 @@ body {
   font-family: var(--font-family);
   background-color: var(--surface-ground);
 }
+
+/* PrimeReact's `.p-password { display: inline-flex }` makes `.p-icon-field` a
+   row flex item with flex-grow: 0, so it shrink-to-fits to the input's
+   intrinsic width instead of filling the 100%-wide wrapper — leaving password
+   fields visibly narrower than adjacent inputs. PrimeReact only grants the
+   full width under `.p-fluid`, so do it here. */
+@layer components {
+  .p-password .p-icon-field {
+    width: 100%;
+  }
+}
