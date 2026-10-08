@@ -7,7 +7,7 @@ export function ProtectedRoute() {
 
   if (isLoading) {
     return (
-      <div className="flex align-items-center justify-content-center" style={{ height: '100vh' }}>
+      <div className="flex items-center justify-center" style={{ height: '100vh' }}>
         <ProgressSpinner />
       </div>
     );

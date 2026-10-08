@@ -62,7 +62,7 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
   };
 
   const footer = (
-    <div className="flex justify-content-end gap-2">
+    <div className="flex justify-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
       <Button label={item ? 'Save Changes' : 'Create'} icon="pi pi-check" onClick={handleSave} loading={loading} />
     </div>
@@ -77,8 +77,8 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
       footer={footer}
       modal
     >
-      <div className="flex flex-column gap-3">
-        <div className="flex flex-column gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <label htmlFor="sp-name">Name *</label>
           <InputText
             id="sp-name"
@@ -88,7 +88,7 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
             autoFocus
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="sp-yearlyAmount">Yearly Amount *</label>
           <InputNumber
             id="sp-yearlyAmount"
@@ -102,7 +102,7 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
             className="w-full"
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="sp-takesEffectYear">Takes Effect Year *</label>
           <InputNumber
             id="sp-takesEffectYear"
@@ -114,7 +114,7 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
             className="w-full"
           />
         </div>
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="sp-notes">Notes</label>
           <InputTextarea
             id="sp-notes"

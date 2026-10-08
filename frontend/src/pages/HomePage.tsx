@@ -125,14 +125,14 @@ export default function HomePage() {
   };
 
   const start = (
-    <div className="flex align-items-center gap-2">
+    <div className="flex items-center gap-2">
       <span className="pi pi-home mr-2" />
       <span className="font-bold">Pension Planner</span>
     </div>
   );
 
   const end = (
-    <div className="flex align-items-center gap-3">
+    <div className="flex items-center gap-4">
       <span className="text-secondary">Signed in as {user?.username}</span>
       <Button label="Settings" icon="pi pi-cog" onClick={() => setSettingsDialogVisible(true)} />
       <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
@@ -147,7 +147,7 @@ export default function HomePage() {
   const colorBody = (row: Pension) =>
     row.color ? (
       <span
-        className="inline-block border-circle"
+        className="inline-block rounded-full"
         style={{ width: '1.25rem', height: '1.25rem', backgroundColor: row.color, border: '1px solid var(--surface-border)' }}
         title={row.color}
       />
@@ -233,13 +233,13 @@ export default function HomePage() {
     <div>
       <Toolbar start={start} end={end} />
 
-      <div className="p-4">
+      <div className="p-6">
         {/* Summary Cards */}
         {dashboardError && <PageError message={apiErrorMessage(dashboardErr)} />}
         {!dashboardError && dashboardLoading && (
-          <div className="grid mb-4">
+          <div className="grid grid-cols-12 gap-4 mb-6">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="col-12 md:col-6 lg:col-3">
+              <div key={i} className="col-span-12 md:col-span-6 lg:col-span-3">
                 <Card className="h-full">
                   <div className="text-secondary" style={{ opacity: 0.6 }}>Loading...</div>
                 </Card>
@@ -248,15 +248,15 @@ export default function HomePage() {
           </div>
         )}
         {!dashboardLoading && !dashboardError && (
-        <div className="grid mb-4">
-          <div className="col-12 md:col-6 lg:col-3">
+        <div className="grid grid-cols-12 gap-4 mb-6">
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <Card title="Portfolio Value" className="h-full">
-              <div className="text-3xl font-bold">{formatCurrency(dashboard?.totalPortfolioValue)}</div>
+              <div className="text-title font-bold">{formatCurrency(dashboard?.totalPortfolioValue)}</div>
             </Card>
           </div>
-          <div className="col-12 md:col-6 lg:col-3">
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <Card title="Projected Annual Income" className="h-full">
-              <div className="text-3xl font-bold">{formatCurrency(dashboard?.totalProjectedAnnualIncome)}</div>
+              <div className="text-title font-bold">{formatCurrency(dashboard?.totalProjectedAnnualIncome)}</div>
               {dashboard?.targetIncome != null && (
                 <div className="mt-2">
                   <div className="text-sm text-secondary mb-1">vs {formatCurrency(dashboard.targetIncome)} target</div>
@@ -265,7 +265,7 @@ export default function HomePage() {
               )}
             </Card>
           </div>
-          <div className="col-12 md:col-6 lg:col-3">
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <Card title="State Pension &amp; Other Income" className="h-full">
               {(dashboard?.statePensions ?? []).length > 0 && (
                 <div className="mb-2">
@@ -291,11 +291,11 @@ export default function HomePage() {
               )}
             </Card>
           </div>
-          <div className="col-12 md:col-6 lg:col-3">
+          <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <Card title="Retirement Countdown" className="h-full">
               {dashboard?.retirementDate ? (
                 <>
-                  <div className="text-3xl font-bold">
+                  <div className="text-title font-bold">
                     {countdownDays != null && countdownDays > 0 ? `${countdownDays} days` : 'Retired'}
                   </div>
                   <div className="text-sm text-secondary">{formatDate(dashboard.retirementDate)}</div>
@@ -309,13 +309,13 @@ export default function HomePage() {
         )}
 
         {/* Pensions Table */}
-        <div className="flex justify-content-between align-items-center mt-0 mb-3">
-          <h2 className="m-0">Pensions</h2>
+        <div className="flex justify-between items-center mt-0 mb-4">
+          <h2 className="m-0 text-2xl font-bold">Pensions</h2>
           <Button label="Add Pension" icon="pi pi-plus" onClick={openCreate} />
         </div>
 
         {isError && (
-          <Message severity="error" text={apiErrorMessage(error)} className="w-full mb-3" />
+          <Message severity="error" text={apiErrorMessage(error)} className="w-full mb-4" />
         )}
 
         <DataTable
@@ -349,13 +349,13 @@ export default function HomePage() {
         </DataTable>
 
         {/* State Pensions Table */}
-        <div className="flex justify-content-between align-items-center mt-5 mb-3">
-          <h2 className="m-0">State Pensions</h2>
+        <div className="flex justify-between items-center mt-8 mb-4">
+          <h2 className="m-0 text-2xl font-bold">State Pensions</h2>
           <Button label="Add State Pension" icon="pi pi-plus" onClick={() => { setSpEditing(null); setSpDialogVisible(true); }} />
         </div>
 
         {spError && (
-          <Message severity="error" text={apiErrorMessage(spErr)} className="w-full mb-3" />
+          <Message severity="error" text={apiErrorMessage(spErr)} className="w-full mb-4" />
         )}
 
         <DataTable
@@ -372,13 +372,13 @@ export default function HomePage() {
         </DataTable>
 
         {/* Other Income Table */}
-        <div className="flex justify-content-between align-items-center mt-5 mb-3">
-          <h2 className="m-0">Other Income</h2>
+        <div className="flex justify-between items-center mt-8 mb-4">
+          <h2 className="m-0 text-2xl font-bold">Other Income</h2>
           <Button label="Add Income" icon="pi pi-plus" onClick={() => { setOiEditing(null); setOiDialogVisible(true); }} />
         </div>
 
         {oiError && (
-          <Message severity="error" text={apiErrorMessage(oiErr)} className="w-full mb-3" />
+          <Message severity="error" text={apiErrorMessage(oiErr)} className="w-full mb-4" />
         )}
 
         <DataTable
@@ -476,7 +476,7 @@ export default function HomePage() {
       />
       <ConfirmDialog />
 
-<footer className="px-4 pb-4 pt-1">
+<footer className="px-6 pb-6 pt-1">
         <div className="text-sm" style={{ color: '#c0c0c0' }}>App Version: v{appInfo?.version ?? ''}</div>
       </footer>
     </div>

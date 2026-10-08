@@ -147,7 +147,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
   };
 
   const footer = (
-    <div className="flex justify-content-end gap-2">
+    <div className="flex justify-end gap-2">
       <Button label="Cancel" icon="pi pi-times" severity="secondary" onClick={onHide} />
       <Button label={pension ? 'Save Changes' : 'Create'} icon="pi pi-check" onClick={submit} loading={submitting} />
     </div>
@@ -163,8 +163,8 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
       modal
     >
       <Toast ref={toast} position="top-right" />
-      <div className="flex flex-column gap-3">
-        <div className="flex flex-column gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-name">Name *</label>
           <InputText
             id="pension-name"
@@ -175,7 +175,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-maturity">Maturity Month *</label>
           <Calendar
             id="pension-maturity"
@@ -189,7 +189,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-status">Status *</label>
           <Dropdown
             id="pension-status"
@@ -200,7 +200,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-color">Colour</label>
           <Dropdown
             id="pension-color"
@@ -209,9 +209,9 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
             onChange={(event) => setColor(event.value)}
             valueTemplate={(option) =>
               option?.value ? (
-                <div className="flex align-items-center gap-2">
+                <div className="flex items-center gap-2">
                   <span
-                    className="inline-block border-circle"
+                    className="inline-block rounded-full"
                     style={{ width: '1rem', height: '1rem', backgroundColor: option.value, border: '1px solid var(--surface-border)' }}
                   />
                   <span>{option.label}</span>
@@ -222,9 +222,9 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
             }
             itemTemplate={(option) =>
               option?.value ? (
-                <div className="flex align-items-center gap-2">
+                <div className="flex items-center gap-2">
                   <span
-                    className="inline-block border-circle"
+                    className="inline-block rounded-full"
                     style={{ width: '1rem', height: '1rem', backgroundColor: option.value, border: '1px solid var(--surface-border)' }}
                   />
                   <span>{option.label}</span>
@@ -236,7 +236,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-providerName">Provider Name</label>
           <InputText
             id="pension-providerName"
@@ -247,7 +247,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-policyNumber">Policy Number</label>
           <InputText
             id="pension-policyNumber"
@@ -257,7 +257,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-workplaceName">Workplace Name</label>
           <InputText
             id="pension-workplaceName"
@@ -267,7 +267,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-tags">Tags</label>
           <MultiSelect
             id="pension-tags"
@@ -281,8 +281,8 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
             showClear
             panelFooterTemplate={
               tagFilter.trim() && !exactMatch ? (
-                <div className="flex justify-content-between align-items-center px-3 py-2 border-top-1 border-300">
-                  <span className="text-sm text-500">
+                <div className="flex justify-between items-center px-4 py-2 border-t border-surface-300">
+                  <span className="text-sm text-surface-500">
                     Create "<strong>{tagFilter.trim()}</strong>" as new tag
                   </span>
                   <Button
@@ -299,7 +299,7 @@ export function PensionFormDialog({ visible, pension, onHide, onSave }: PensionF
           />
         </div>
 
-        <div className="flex flex-column gap-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="pension-notes">Notes</label>
           <InputTextarea
             id="pension-notes"
