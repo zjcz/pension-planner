@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -162,5 +163,38 @@ class PensionServiceTest {
 
         assertThat(service.listForUser(42L)).hasSize(1);
         verify(pensionRepository).findByUserIdOrderByNameAsc(42L);
+    }
+
+    @Test
+    void getLatestProjectedAnnualAmountsPicksMostRecentStatementPerPension() {
+        PensionStatement older = new PensionStatement();
+        older.setPensionId(5L);
+        older.setStatementDate(LocalDate.of(2024, 1, 1));
+        older.setProjectedAnnualAmount(4000L);
+
+        PensionStatement newer = new PensionStatement();
+        newer.setPensionId(5L);
+        newer.setStatementDate(LocalDate.of(2026, 1, 1));
+        newer.setProjectedAnnualAmount(5000L);
+
+        PensionStatement otherPension = new PensionStatement();
+        otherPension.setPensionId(6L);
+        otherPension.setStatementDate(LocalDate.of(2025, 6, 1));
+        otherPension.setProjectedAnnualAmount(3000L);
+
+        when(statementRepository.findByPensionIdInOrderByStatementDateDesc(List.of(5L, 6L)))
+                .thenReturn(List.of(newer, older, otherPension));
+
+        var result = service.getLatestProjectedAnnualAmountsByPensionId(List.of(5L, 6L));
+
+        assertThat(result).containsOnly(entry(5L, 5000L), entry(6L, 3000L));
+    }
+
+    @Test
+    void getLatestProjectedAnnualAmountsReturnsEmptyMapWhenNoPensionIds() {
+        var result = service.getLatestProjectedAnnualAmountsByPensionId(List.of());
+
+        assertThat(result).isEmpty();
+        verify(statementRepository, never()).findByPensionIdInOrderByStatementDateDesc(any());
     }
 }
