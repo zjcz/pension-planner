@@ -35,8 +35,12 @@ public class PensionController {
         List<Pension> pensions = pensionService.listForUser(userId);
         List<Long> pensionIds = pensions.stream().map(Pension::getPensionId).toList();
         java.util.Map<Long, List<TagDto>> tagsByPension = pensionService.getTagsForPensionsByPensionId(pensionIds);
+        java.util.Map<Long, Long> latestProjectedAnnualAmounts =
+                pensionService.getLatestProjectedAnnualAmountsByPensionId(pensionIds);
         return pensions.stream()
-                .map(p -> PensionDto.from(p, tagsByPension.getOrDefault(p.getPensionId(), List.of())))
+                .map(p -> PensionDto.from(p,
+                        tagsByPension.getOrDefault(p.getPensionId(), List.of()),
+                        latestProjectedAnnualAmounts.get(p.getPensionId())))
                 .toList();
     }
 

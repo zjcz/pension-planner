@@ -16,10 +16,15 @@ public record PensionDto(
         List<TagDto> tags,
         String providerName,
         String policyNumber,
-        String workplaceName
+        String workplaceName,
+        Long latestProjectedAnnualAmount
 ) {
 
     public static PensionDto from(Pension pension, List<TagDto> tags) {
+        return from(pension, tags, null);
+    }
+
+    public static PensionDto from(Pension pension, List<TagDto> tags, Long latestProjectedAnnualAmount) {
         return new PensionDto(
                 pension.getPensionId(),
                 pension.getName(),
@@ -31,6 +36,7 @@ public record PensionDto(
                 tags,
                 pension.getProviderName(),
                 pension.getPolicyNumber(),
-                pension.getWorkplaceName());
+                pension.getWorkplaceName(),
+                latestProjectedAnnualAmount);
     }
 }

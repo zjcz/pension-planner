@@ -339,6 +339,16 @@ export default function HomePage() {
           <Column header="Maturity" body={(row: Pension) => formatMonthYear(row.maturityDate)} sortable />
           <Column header="Status" body={statusBody} sortable />
           <Column header="Status Date" body={(row: Pension) => formatDate(row.statusDate)} sortable />
+          <Column
+            header="Projected Annual"
+            body={(row: Pension) =>
+              row.latestProjectedAnnualAmount != null
+                ? formatCurrency(row.latestProjectedAnnualAmount)
+                : <span className="text-secondary">—</span>
+            }
+            sortable
+            sortField="latestProjectedAnnualAmount"
+          />
           <Column header="Colour" body={colorBody} />
           <Column header="Tags" body={(row: Pension) =>
             row.tags && row.tags.length > 0
