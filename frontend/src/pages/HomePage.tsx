@@ -327,6 +327,7 @@ export default function HomePage() {
           <Column
             header="Name"
             sortable
+            sortField="name"
             body={(row: Pension) => (
               <span
                 className="cursor-pointer text-primary font-semibold hover:underline"
@@ -336,9 +337,9 @@ export default function HomePage() {
               </span>
             )}
           />
-          <Column header="Maturity" body={(row: Pension) => formatMonthYear(row.maturityDate)} sortable />
-          <Column header="Status" body={statusBody} sortable />
-          <Column header="Status Date" body={(row: Pension) => formatDate(row.statusDate)} sortable />
+          <Column header="Maturity" body={(row: Pension) => formatMonthYear(row.maturityDate)} sortable sortField="maturityDate" />
+          <Column header="Status" body={statusBody} sortable sortField="status" />
+          <Column header="Status Date" body={(row: Pension) => formatDate(row.statusDate)} sortable sortField="statusDate" />
           <Column header="Colour" body={colorBody} />
           <Column header="Tags" body={(row: Pension) =>
             row.tags && row.tags.length > 0
