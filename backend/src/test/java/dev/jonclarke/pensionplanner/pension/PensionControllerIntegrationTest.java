@@ -198,6 +198,45 @@ class PensionControllerIntegrationTest {
         assertThat(pensionActionsFor(pension.getPensionId())).containsExactly("CREATE", "DELETE");
     }
 
+    @Test
+    void listIncludesLatestProjectedAnnualAmountFromMostRecentStatement() throws Exception {
+        Cookie cookie = register("erin", "password123");
+
+        String withStatementsId = jsonStringAt(mockMvc.perform(post("/api/v1/pensions")
+                        .cookie(cookie)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"With Statements\",\"maturityDate\":\"2045-08-01\",\"status\":\"ACTIVE\"}"))
+                .andExpect(status().isCreated())
+                .andReturn(), "$.pensionId");
+
+        String withoutStatementsId = jsonStringAt(mockMvc.perform(post("/api/v1/pensions")
+                        .cookie(cookie)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"No Statements\",\"maturityDate\":\"2045-08-01\",\"status\":\"ACTIVE\"}"))
+                .andExpect(status().isCreated())
+                .andReturn(), "$.pensionId");
+
+        saveStatement(withStatementsId, java.time.LocalDate.of(2024, 1, 1), 100000L, 4000L);
+        saveStatement(withStatementsId, java.time.LocalDate.of(2026, 1, 1), 120000L, 5000L);
+
+        mockMvc.perform(get("/api/v1/pensions").cookie(cookie))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.pensionId == " + withStatementsId + ")].latestProjectedAnnualAmount")
+                        .value(org.hamcrest.Matchers.contains(5000)))
+                .andExpect(jsonPath("$[?(@.pensionId == " + withoutStatementsId + ")].latestProjectedAnnualAmount")
+                        .value(org.hamcrest.Matchers.contains((Object) null)));
+    }
+
+    private void saveStatement(String pensionId, java.time.LocalDate date, Long planValue, Long projectedAnnualAmount) {
+        PensionStatement statement = new PensionStatement();
+        statement.setPensionId(Long.parseLong(pensionId));
+        statement.setStatementDate(date);
+        statement.setPlanValue(planValue);
+        statement.setProjectedAnnualAmount(projectedAnnualAmount);
+        statementRepository.save(statement);
+    }
+
     private Cookie register(String username, String password) throws Exception {
         MockHttpServletResponse response = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(APPLICATION_JSON)

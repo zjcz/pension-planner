@@ -30,6 +30,13 @@ describe('Phase 2 FE smoke: dashboard renders cards and table', () => {
 
     expect(screen.getByText('Scottish Widows')).toBeInTheDocument();
     expect(screen.getByText('Pensions')).toBeInTheDocument();
+    const projectedHeader = screen.getByText('Projected Annual');
+    expect(projectedHeader).toBeInTheDocument();
+
+    const avivaRow = screen.getByText('Aviva Workplace').closest('tr');
+    expect(within(avivaRow as HTMLElement).getByText('£1,350')).toBeInTheDocument();
+    const widowsRow = screen.getByText('Scottish Widows').closest('tr');
+    expect(within(widowsRow as HTMLElement).getAllByText('—').length).toBeGreaterThan(0);
   });
 
   it('shows the countdown derived from retirementDate', async () => {

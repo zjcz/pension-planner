@@ -42,6 +42,18 @@ public class PensionService {
     }
 
     @Transactional(readOnly = true)
+    public java.util.Map<Long, Long> getLatestProjectedAnnualAmountsByPensionId(List<Long> pensionIds) {
+        if (pensionIds.isEmpty()) {
+            return java.util.Map.of();
+        }
+        java.util.Map<Long, Long> latestByPensionId = new java.util.HashMap<>();
+        for (PensionStatement statement : statementRepository.findByPensionIdInOrderByStatementDateDesc(pensionIds)) {
+            latestByPensionId.putIfAbsent(statement.getPensionId(), statement.getProjectedAnnualAmount());
+        }
+        return latestByPensionId;
+    }
+
+    @Transactional(readOnly = true)
     public Pension getForUser(Long userId, Long pensionId) {
         return pensionRepository.findByPensionIdAndUserId(pensionId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Pension not found"));

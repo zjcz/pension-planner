@@ -42,6 +42,7 @@ export const pensions: Pension[] = [
     providerName: 'Aviva',
     policyNumber: 'AV-123',
     workplaceName: 'Corp Ltd',
+    latestProjectedAnnualAmount: 1350,
   },
   {
     pensionId: 2,
@@ -55,6 +56,7 @@ export const pensions: Pension[] = [
     providerName: null,
     policyNumber: null,
     workplaceName: null,
+    latestProjectedAnnualAmount: null,
   },
 ];
 

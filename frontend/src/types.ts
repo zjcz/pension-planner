@@ -42,6 +42,7 @@ export interface Pension {
   providerName: string | null;
   policyNumber: string | null;
   workplaceName: string | null;
+  latestProjectedAnnualAmount: number | null;
 }
 
 export interface PensionRequest {

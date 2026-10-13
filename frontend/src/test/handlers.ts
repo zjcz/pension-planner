@@ -83,6 +83,7 @@ export const handlers = [
       providerName: body.providerName,
       policyNumber: body.policyNumber,
       workplaceName: body.workplaceName,
+      latestProjectedAnnualAmount: null,
     };
     pensions.unshift(created);
     return HttpResponse.json(created);
