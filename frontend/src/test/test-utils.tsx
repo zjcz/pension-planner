@@ -2,6 +2,7 @@ import { render as rtlRender, type RenderOptions } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { PrimeReactProvider } from 'primereact/api';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { AuthProvider } from '../auth/AuthContext';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -36,7 +37,10 @@ export function renderWithProviders(
       <PrimeReactProvider>
         <QueryClientProvider client={client}>
           <AuthProvider>
-            <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+            <MemoryRouter initialEntries={[route]}>
+              {children}
+              <ConfirmDialog />
+            </MemoryRouter>
           </AuthProvider>
         </QueryClientProvider>
       </PrimeReactProvider>

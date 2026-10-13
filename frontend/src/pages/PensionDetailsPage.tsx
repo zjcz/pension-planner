@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Chart } from 'primereact/chart';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { DataTable } from 'primereact/datatable';
 import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
@@ -312,7 +312,6 @@ export default function PensionDetailsPage() {
           { field: 'statementNotes', header: 'Notes' },
         ]}
       />
-      <ConfirmDialog />
     </div>
   );
 }

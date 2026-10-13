@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Column } from 'primereact/column';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { DataTable } from 'primereact/datatable';
 import { Message } from 'primereact/message';
 import { ProgressBar } from 'primereact/progressbar';
@@ -485,7 +485,6 @@ export default function HomePage() {
           { field: 'notes', header: 'Notes' },
         ]}
       />
-      <ConfirmDialog />
 
 <footer className="px-6 pb-6 pt-1">
         <div className="text-sm" style={{ color: '#c0c0c0' }}>App Version: v{appInfo?.version ?? ''}</div>

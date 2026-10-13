@@ -6,7 +6,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Message } from 'primereact/message';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { apiErrorMessage } from '../api/client';
 import { useSettings, useUpdateSettings } from '../hooks/useSettings';
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '../hooks/useTags';
@@ -132,7 +132,6 @@ export function SettingsDialog({ visible, onHide }: SettingsDialogProps) {
       footer={footer}
       modal
     >
-      <ConfirmDialog />
       {settingsLoading ? (
         <p className="my-3.5 text-secondary">Loading...</p>
       ) : settingsError ? (

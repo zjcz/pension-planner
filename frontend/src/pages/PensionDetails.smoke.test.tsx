@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { PrimeReactProvider } from 'primereact/api';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../auth/AuthContext';
 import PensionDetailsPage from '../pages/PensionDetailsPage';
@@ -26,6 +27,7 @@ function renderDetails() {
             <Routes>
               <Route path="/pensions/:id" element={<PensionDetailsPage />} />
             </Routes>
+            <ConfirmDialog />
           </MemoryRouter>
         </AuthProvider>
       </QueryClientProvider>
