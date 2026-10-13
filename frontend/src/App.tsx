@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
@@ -37,6 +38,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SessionExpiredWatcher router={router} />
+        <ConfirmDialog />
         <RouterProvider router={router} />
       </AuthProvider>
     </QueryClientProvider>
