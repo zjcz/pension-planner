@@ -44,4 +44,40 @@ describe('Phase 8 FE smoke: settings save reflects on dashboard', () => {
     });
     expect(screen.getByText('1 Jun 2050')).toBeInTheDocument();
   });
+
+  async function setAuditLogging(user: ReturnType<typeof userEvent.setup>, enabled: boolean) {
+    await user.click(screen.getByRole('button', { name: /Settings/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    const toggle = dialog.querySelector('input[role="switch"]') as HTMLInputElement;
+    if ((toggle.getAttribute('aria-checked') === 'true') !== enabled) {
+      await user.click(toggle);
+      expect(toggle.getAttribute('aria-checked')).toBe(String(enabled));
+    }
+    await user.click(within(dialog).getByRole('button', { name: /^Save$/i }));
+
+    if (!enabled) {
+      const disable = await screen.findByRole('button', { name: /Disable and delete/i });
+      await user.click(disable);
+    }
+  }
+
+  it('hides and restores the audit history buttons when the setting is toggled', async () => {
+    const user = userEvent.setup();
+    render(<HomePage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByLabelText('Audit History')).toHaveLength(6);
+    });
+
+    await setAuditLogging(user, false);
+    await waitFor(() => {
+      expect(screen.queryAllByLabelText('Audit History')).toHaveLength(0);
+    });
+
+    await setAuditLogging(user, true);
+    await waitFor(() => {
+      expect(screen.getAllByLabelText('Audit History')).toHaveLength(6);
+    });
+  });
 });

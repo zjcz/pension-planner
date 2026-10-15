@@ -323,6 +323,7 @@ export default function HomePage() {
           loading={isLoading}
           stripedRows
           emptyMessage={'No pensions yet. Click "Add Pension" to create one.'}
+          cellMemo={false}
         >
           <Column
             header="Name"
@@ -374,6 +375,7 @@ export default function HomePage() {
           loading={spLoading}
           stripedRows
           emptyMessage={'No state pensions yet. Click "Add State Pension" to create one.'}
+          cellMemo={false}
         >
           <Column field="name" header="Name" sortable />
           <Column header="Yearly Amount" body={(row: StatePension) => formatCurrency(row.yearlyAmount)} sortable sortField="yearlyAmount" />
@@ -397,6 +399,7 @@ export default function HomePage() {
           loading={oiLoading}
           stripedRows
           emptyMessage={'No other income streams yet. Click "Add Income" to create one.'}
+          cellMemo={false}
         >
           <Column field="name" header="Name" sortable />
           <Column header="Annual Amount" body={(row: OtherIncome) => formatCurrency(row.annualAmount)} sortable sortField="annualAmount" />
