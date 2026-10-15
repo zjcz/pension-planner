@@ -261,6 +261,7 @@ export default function PensionDetailsPage() {
             loading={stmtLoading}
             stripedRows
             emptyMessage={'No statements yet. Click \u201cAdd Statement\u201d to create one.'}
+            cellMemo={false}
           >
             <Column header="Date" body={statusBody} sortable sortField="statementDate" />
             <Column header="Plan Value" body={(row: Statement) => formatCurrency(row.planValue)} sortable sortField="planValue" />
