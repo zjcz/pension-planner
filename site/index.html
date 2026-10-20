@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pension Planner — Plan and track your pension</title>
+  <meta name="description" content="Pension Planner is an open-source web app for planning and tracking your pensions. Java 25, Spring Boot, React 19. Self-host with Docker in minutes." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="android-icon-192x192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/70">
+    <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-3">
+        <img src="android-icon-192x192.png" alt="Pension Planner logo" class="h-9 w-9 rounded-lg" />
+        <span class="text-lg font-semibold text-white">Pension Planner</span>
+      </div>
+      <a href="https://github.com/zjcz/pension-planner"
+         class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700">
+        GitHub
+      </a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-5xl px-6 pb-20 pt-20 text-center sm:pt-28">
+    <p class="mb-4 inline-block rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+      Open source &middot; Early development
+    </p>
+    <h1 class="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">
+      Take control of your pension planning
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
+      Pension Planner is a self-hostable web app for tracking your pensions, income sources,
+      and planning for retirement — all under your own control.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <a href="#get-started"
+         class="rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">
+        Get started
+      </a>
+      <a href="https://github.com/zjcz/pension-planner"
+         class="rounded-lg border border-slate-700 px-6 py-3 font-semibold text-white transition hover:bg-slate-900">
+        View on GitHub
+      </a>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="border-t border-slate-800/70 bg-slate-900/40">
+    <div class="mx-auto max-w-5xl px-6 py-20">
+      <h2 class="text-center text-3xl font-bold text-white">What it does</h2>
+      <p class="mx-auto mt-3 max-w-2xl text-center text-slate-400">
+        Built for people who want a clear picture of their retirement outlook without
+        sending their data to a third party.
+      </p>
+      <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128200;</div>
+          <h3 class="mt-4 font-semibold text-white">Pension dashboard</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Track multiple pension pots, state pension entitlement, and other income sources in one place.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128221;</div>
+          <h3 class="mt-4 font-semibold text-white">Audit history</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Optional audit trail for your data changes, with a per-user toggle and full change history view.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128646;</div>
+          <h3 class="mt-4 font-semibold text-white">Docker &amp; native image</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Run via Docker Compose or grab a blazing-fast GraalVM native image from GitHub Packages.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128101;</div>
+          <h3 class="mt-4 font-semibold text-white">Multi user</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Run multiple accounts in a single instance, each with their own securely separated data.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128421;&#65039;</div>
+          <h3 class="mt-4 font-semibold text-white">Self-hosted</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Single Spring Boot JAR serves the API and the UI. SQLite database — no external services required.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+          <div class="text-2xl" aria-hidden="true">&#128736;&#65039;</div>
+          <h3 class="mt-4 font-semibold text-white">Modern stack</h3>
+          <p class="mt-2 text-sm text-slate-400">
+            Java 25 &amp; Spring Boot 3.5 backend, React 19 &amp; TypeScript frontend with a fully tested codebase.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech stack -->
+  <section class="border-t border-slate-800/70">
+    <div class="mx-auto max-w-5xl px-6 py-20">
+      <h2 class="text-center text-3xl font-bold text-white">Built with</h2>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3 text-sm">
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">Java 25</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">Spring Boot 3.5</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">SQLite + Flyway</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">React 19</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">TypeScript</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">Vite</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">PrimeReact</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">TanStack Query</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">Tailwind CSS</span>
+        <span class="rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-slate-300">Docker</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Get started -->
+  <section id="get-started" class="border-t border-slate-800/70 bg-slate-900/40">
+    <div class="mx-auto max-w-5xl px-6 py-20">
+      <h2 class="text-center text-3xl font-bold text-white">Get started in minutes</h2>
+      <p class="mx-auto mt-3 max-w-2xl text-center text-slate-400">
+        Run the prebuilt image from GitHub Packages, or build from source. Full setup
+        instructions — including IntelliJ and command-line options — are in the README.
+      </p>
+
+      <div class="mx-auto mt-12 max-w-2xl">
+        <h3 class="text-lg font-semibold text-white">Run the published image</h3>
+        <p class="mt-2 text-sm text-slate-400">
+          The quickest way to get going. Save the following as <code class="rounded bg-slate-800 px-1.5 py-0.5 text-emerald-400">docker-compose.yml</code>
+          and start it with <code class="rounded bg-slate-800 px-1.5 py-0.5 text-emerald-400">docker compose up -d</code>.
+        </p>
+        <pre class="mt-4 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-6 text-sm text-emerald-400"><code>services:
+  pension-planner:
+    image: ghcr.io/zjcz/pension-planner:latest
+    container_name: pension-planner
+    restart: unless-stopped
+    ports:
+      - "8080:8080" # host:container — change the host port if 8080 is taken
+    environment:
+      # Set a fixed secret so logins survive restarts (any long random string)
+      - JWT_SECRET=change-me-to-a-long-random-string
+    volumes:
+      - pension_planner_data:/data # persistent database volume
+
+volumes:
+  pension_planner_data:</code></pre>
+        <p class="mt-4 text-sm text-slate-500">
+          Then open <a href="http://localhost:8080" class="text-emerald-400 transition hover:text-emerald-300">http://localhost:8080</a>,
+          create an account, and start planning.
+        </p>
+      </div>
+
+      <div class="mx-auto mt-12 max-w-2xl border-t border-slate-800 pt-12">
+        <h3 class="text-lg font-semibold text-white">Alternatively, run the code</h3>
+        <p class="mt-2 text-sm text-slate-400">
+          Build and run the full stack from source with Docker Compose.
+        </p>
+        <pre class="mt-4 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-6 text-sm text-emerald-400"><code>git clone https://github.com/zjcz/pension-planner.git
+cd pension-planner
+docker compose up</code></pre>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="https://github.com/zjcz/pension-planner#readme"
+           class="font-medium text-emerald-400 transition hover:text-emerald-300">
+          Read the full documentation &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Status -->
+  <section class="border-t border-slate-800/70">
+    <div class="mx-auto max-w-3xl px-6 py-16 text-center">
+      <h2 class="text-2xl font-bold text-white">Project status</h2>
+      <p class="mt-4 text-slate-400">
+        Pension Planner is under active development. Authentication, user settings, and audit
+        history are working today; the pension dashboard is the current focus. Issues and pull
+        requests are welcome.
+      </p>
+      <a href="https://github.com/zjcz/pension-planner/issues"
+         class="mt-6 inline-block font-medium text-emerald-400 transition hover:text-emerald-300">
+        See what's in progress &rarr;
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/70">
+    <div class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-slate-500 sm:flex-row">
+      <p>&copy; 2026 Pension Planner. Open source project.</p>
+      <a href="https://github.com/zjcz/pension-planner" class="transition hover:text-slate-300">github.com/zjcz/pension-planner</a>
+    </div>
+  </footer>
+
+</body>
+</html>
