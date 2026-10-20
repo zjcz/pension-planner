@@ -233,3 +233,7 @@ docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
 | primeicons | Icon set used alongside PrimeReact components. |
 | vite + @vitejs/plugin-react | Dev server with hot module replacement and the production bundler; the plugin adds React fast refresh. |
 | typescript | Static typing for the frontend codebase, enforced via `tsc` in the build. |
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
