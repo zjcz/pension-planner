@@ -9,7 +9,6 @@ import { Message } from 'primereact/message';
 import { Tag } from 'primereact/tag';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
-import { useAuth } from '../auth/AuthContext';
 import { AuditDialog, formatLong } from '../components/AuditDialog';
 import { PageError } from '../components/PageError';
 import { PageLoading } from '../components/PageLoading';
@@ -17,6 +16,8 @@ import { StatementFormDialog } from '../components/StatementFormDialog';
 import { useStatementAudit } from '../hooks/useAudit';
 import { usePension } from '../hooks/usePensions';
 import { useSettings } from '../hooks/useSettings';
+import { SettingsDialog } from '../components/SettingsDialog';
+import { UserMenu } from '../components/UserMenu';
 import {
   useStatements,
   useCreateStatement,
@@ -40,9 +41,9 @@ export default function PensionDetailsPage() {
   const pensionId = Number(id);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Statement | null>(null);
+  const [settingsDialogVisible, setSettingsDialogVisible] = useState(false);
 
   useEffect(() => {
     if ((location.state as { addStatement?: boolean } | null)?.addStatement) {
@@ -63,11 +64,6 @@ export default function PensionDetailsPage() {
   const [statementAuditTarget, setStatementAuditTarget] = useState<Statement | null>(null);
   const { data: statementAuditRecords = [], isLoading: statementAuditLoading, isError: statementAuditError, error: statementAuditErr } =
     useStatementAudit(statementAuditTarget?.statementId ?? -1, statementAuditTarget != null && auditEnabled);
-
-  const onLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
 
   const openCreate = () => {
     setEditing(null);
@@ -144,10 +140,9 @@ export default function PensionDetailsPage() {
   );
 
   const end = (
-    <div className="flex items-center gap-4">
-      <span className="text-secondary">Signed in as {user?.username}</span>
+    <div className="flex items-center gap-2">
       <Button label="Add Statement" icon="pi pi-plus" onClick={openCreate} />
-      <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
+      <UserMenu showSettings onOpenSettings={() => setSettingsDialogVisible(true)} />
     </div>
   );
 
@@ -313,6 +308,7 @@ export default function PensionDetailsPage() {
           { field: 'statementNotes', header: 'Notes' },
         ]}
       />
+      <SettingsDialog visible={settingsDialogVisible} onHide={() => setSettingsDialogVisible(false)} />
     </div>
   );
 }

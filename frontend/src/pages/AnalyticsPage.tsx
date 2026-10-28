@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Chart } from 'primereact/chart';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
-import { useAuth } from '../auth/AuthContext';
 import { PageError } from '../components/PageError';
 import { PageLoading } from '../components/PageLoading';
+import { SettingsDialog } from '../components/SettingsDialog';
+import { UserMenu } from '../components/UserMenu';
 import { useAnalytics } from '../hooks/useAnalytics';
 
 function formatCurrency(value: number): string {
@@ -19,14 +21,9 @@ function colorFor(i: number, explicit: string | null): string {
 }
 
 export default function AnalyticsPage() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [settingsDialogVisible, setSettingsDialogVisible] = useState(false);
   const { data, isLoading, isError, error } = useAnalytics();
-
-  const onLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
 
   const start = (
     <div className="flex items-center gap-2">
@@ -36,9 +33,8 @@ export default function AnalyticsPage() {
   );
 
   const end = (
-    <div className="flex items-center gap-4">
-      <span className="text-secondary">Signed in as {user?.username}</span>
-      <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
+    <div className="flex items-center gap-2">
+      <UserMenu showSettings onOpenSettings={() => setSettingsDialogVisible(true)} />
     </div>
   );
 
@@ -252,6 +248,7 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+      <SettingsDialog visible={settingsDialogVisible} onHide={() => setSettingsDialogVisible(false)} />
     </div>
   );
 }
