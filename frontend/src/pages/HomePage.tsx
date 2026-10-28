@@ -12,7 +12,6 @@ import { Tag } from 'primereact/tag';
 import { Toolbar } from 'primereact/toolbar';
 import { apiErrorMessage } from '../api/client';
 import { infoApi } from '../api/info';
-import { useAuth } from '../auth/AuthContext';
 import { AuditDialog, formatLong } from '../components/AuditDialog';
 import { PageError } from '../components/PageError';
 import { PensionFormDialog } from '../components/PensionFormDialog';
@@ -25,6 +24,7 @@ import { useOtherIncomeList, useCreateOtherIncome, useUpdateOtherIncome, useDele
 import { useCreatePension, useDeletePension, usePensions, useUpdatePension } from '../hooks/usePensions';
 import { useSettings } from '../hooks/useSettings';
 import { useCreateStatePension, useDeleteStatePension, useStatePensionList, useUpdateStatePension } from '../hooks/useStatePension';
+import { UserMenu } from '../components/UserMenu';
 import type { Pension, PensionRequest, OtherIncome, OtherIncomeRequest, OtherIncomeAuditEntry, StatePension, StatePensionAuditEntry, StatePensionRequest } from '../types';
 
 function formatCurrency(value: number | null | undefined): string {
@@ -49,7 +49,6 @@ function daysUntil(dateStr: string): number {
 }
 
 export default function HomePage() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Pension | null>(null);
@@ -90,11 +89,6 @@ export default function HomePage() {
   const updateSp = useUpdateStatePension();
   const deleteSp = useDeleteStatePension();
 
-  const onLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
-
   const openCreate = () => {
     setEditing(null);
     setDialogVisible(true);
@@ -132,11 +126,9 @@ export default function HomePage() {
   );
 
   const end = (
-    <div className="flex items-center gap-4">
-      <span className="text-secondary">Signed in as {user?.username}</span>
-      <Button label="Settings" icon="pi pi-cog" onClick={() => setSettingsDialogVisible(true)} />
+    <div className="flex items-center gap-2">
       <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
-      <Button label="Log Out" icon="pi pi-sign-out" severity="secondary" onClick={onLogout} />
+      <UserMenu showSettings onOpenSettings={() => setSettingsDialogVisible(true)} />
     </div>
   );
 

@@ -13,7 +13,9 @@ describe('Phase 8 FE smoke: settings save reflects on dashboard', () => {
       expect(screen.getByText('Portfolio Value')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /User menu/i }));
+    const settingsItem = await screen.findByText('Settings');
+    await user.click(settingsItem);
 
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText('Settings')).toBeInTheDocument();
@@ -30,7 +32,9 @@ describe('Phase 8 FE smoke: settings save reflects on dashboard', () => {
     });
     expect(screen.getByText('vs £30,000 target')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /User menu/i }));
+    const settingsItem2 = await screen.findByText('Settings');
+    await user.click(settingsItem2);
 
     const dialog = await screen.findByRole('dialog');
     const targetInput = within(dialog).getByLabelText(/Target Annual Income/i);
@@ -46,7 +50,9 @@ describe('Phase 8 FE smoke: settings save reflects on dashboard', () => {
   });
 
   async function setAuditLogging(user: ReturnType<typeof userEvent.setup>, enabled: boolean) {
-    await user.click(screen.getByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /User menu/i }));
+    const settingsItem3 = await screen.findByText('Settings');
+    await user.click(settingsItem3);
 
     const dialog = await screen.findByRole('dialog');
     const toggle = dialog.querySelector('input[role="switch"]') as HTMLInputElement;
