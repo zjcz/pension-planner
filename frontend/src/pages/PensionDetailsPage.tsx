@@ -141,7 +141,7 @@ export default function PensionDetailsPage() {
 
   const end = (
     <div className="flex items-center gap-2">
-      <Button label="Add Statement" icon="pi pi-plus" onClick={openCreate} />
+      <Button label="Add Statement" icon="pi pi-plus" rounded text onClick={openCreate} />
       <UserMenu showSettings onOpenSettings={() => setSettingsDialogVisible(true)} />
     </div>
   );
