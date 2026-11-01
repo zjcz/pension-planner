@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -18,6 +18,7 @@ import { PensionFormDialog } from '../components/PensionFormDialog';
 import { OtherIncomeDialog } from '../components/OtherIncomeDialog';
 import { SettingsDialog } from '../components/SettingsDialog';
 import { StatePensionDialog } from '../components/StatePensionDialog';
+import { WelcomeDialog } from '../components/WelcomeDialog';
 import { usePensionAudit, useOtherIncomeAudit, useStatePensionAudit } from '../hooks/useAudit';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOtherIncomeList, useCreateOtherIncome, useUpdateOtherIncome, useDeleteOtherIncome } from '../hooks/useOtherIncome';
@@ -50,6 +51,7 @@ function daysUntil(dateStr: string): number {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editing, setEditing] = useState<Pension | null>(null);
   const [spDialogVisible, setSpDialogVisible] = useState(false);
@@ -60,6 +62,9 @@ export default function HomePage() {
   const [pensionAuditTarget, setPensionAuditTarget] = useState<Pension | null>(null);
   const [oiAuditTarget, setOiAuditTarget] = useState<OtherIncome | null>(null);
   const [spAuditTarget, setSpAuditTarget] = useState<StatePension | null>(null);
+  const [welcomeVisible, setWelcomeVisible] = useState(
+    () => (location.state as { showWelcome?: boolean } | null)?.showWelcome ?? false,
+  );
 
   const { data: settings } = useSettings();
   const auditEnabled = settings?.auditEnabled ?? false;
@@ -426,6 +431,7 @@ export default function HomePage() {
         loading={createOi.isPending || updateOi.isPending}
       />
       <SettingsDialog visible={settingsDialogVisible} onHide={() => setSettingsDialogVisible(false)} />
+      <WelcomeDialog visible={welcomeVisible} onHide={() => setWelcomeVisible(false)} />
       <AuditDialog
         visible={pensionAuditTarget != null}
         title={pensionAuditTarget?.name ?? 'Pension'}
