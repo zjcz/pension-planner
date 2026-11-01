@@ -26,7 +26,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (user) {
-      navigate('/', { replace: true });
+      navigate('/', { replace: true, state: { showWelcome: true } });
     }
   }, [user, navigate]);
 
@@ -52,7 +52,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(username, password);
-      navigate('/', { replace: true });
+      navigate('/', { replace: true, state: { showWelcome: true } });
     } catch (err) {
       setError(apiErrorMessage(err));
     } finally {
