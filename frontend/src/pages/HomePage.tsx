@@ -132,7 +132,7 @@ export default function HomePage() {
 
   const end = (
     <div className="flex items-center gap-2">
-      <Button label="Analytics" icon="pi pi-chart-bar" onClick={() => navigate('/analytics')} />
+      <Button label="View Analytics" icon="pi pi-chart-bar" rounded text onClick={() => navigate('/analytics')} />
       <UserMenu showSettings onOpenSettings={() => setSettingsDialogVisible(true)} />
     </div>
   );
@@ -308,7 +308,7 @@ export default function HomePage() {
         {/* Pensions Table */}
         <div className="flex justify-between items-center mt-0 mb-4">
           <h2 className="m-0 text-2xl font-bold">Pensions</h2>
-          <Button label="Add Pension" icon="pi pi-plus" onClick={openCreate} />
+          <Button label="Add Pension" icon="pi pi-plus" rounded text onClick={openCreate} />
         </div>
 
         {isError && (
@@ -360,7 +360,7 @@ export default function HomePage() {
         {/* State Pensions Table */}
         <div className="flex justify-between items-center mt-8 mb-4">
           <h2 className="m-0 text-2xl font-bold">State Pensions</h2>
-          <Button label="Add State Pension" icon="pi pi-plus" onClick={() => { setSpEditing(null); setSpDialogVisible(true); }} />
+          <Button label="Add State Pension" icon="pi pi-plus" rounded text onClick={() => { setSpEditing(null); setSpDialogVisible(true); }} />
         </div>
 
         {spError && (
@@ -384,7 +384,7 @@ export default function HomePage() {
         {/* Other Income Table */}
         <div className="flex justify-between items-center mt-8 mb-4">
           <h2 className="m-0 text-2xl font-bold">Other Income</h2>
-          <Button label="Add Income" icon="pi pi-plus" onClick={() => { setOiEditing(null); setOiDialogVisible(true); }} />
+          <Button label="Add Income" icon="pi pi-plus" rounded text onClick={() => { setOiEditing(null); setOiDialogVisible(true); }} />
         </div>
 
         {oiError && (
