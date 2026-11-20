@@ -25,7 +25,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 # JVM options: silent SQLite native-access warning (same as dev run config),
 # tuned for a small container (UseSerialGC for low memory footprint).
-ENV JAVA_OPTS="--enable-native-access=ALL-UNNAMED -XX:+UseSerialGC"
+# -XX:-UseBASE64Intrinsics mitigates CVE-2026-114938 (Java4Shell) It is harmless to keep
+# after upgrading: it only falls back to the non-intrinsic Base64 decoder.
+ENV JAVA_OPTS="--enable-native-access=ALL-UNNAMED -XX:+UseSerialGC -XX:-UseBASE64Intrinsics"
 
 # Run as a non-root user; the base image's `ubuntu` user is uid 1000, which
 # matches the typical first host user so a bind-mounted ./data dir stays writable.
