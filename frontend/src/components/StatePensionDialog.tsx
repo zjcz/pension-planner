@@ -124,6 +124,23 @@ export function StatePensionDialog({ visible, item, onHide, onSave, loading }: S
             className="w-full"
           />
         </div>
+        <Message
+            severity="info"
+            className="w-full"
+            text={
+              <>
+                You can check your state pension entitlement here: {' '}
+                <a
+                    href="https://www.tax.service.gov.uk/check-your-state-pension/account"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                >
+                  www.tax.service.gov.uk
+                </a>
+              </>
+            }
+        />
         {formError && <Message severity="error" text={formError} />}
       </div>
     </Dialog>
