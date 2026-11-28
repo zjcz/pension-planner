@@ -487,8 +487,18 @@ export default function HomePage() {
         ]}
       />
 
-<footer className="px-6 pb-6 pt-1">
-        <div className="text-sm" style={{ color: '#c0c0c0' }}>App Version: v{appInfo?.version ?? ''}</div>
+      <footer className="px-6 pb-6 pt-1">
+        <div className="text-sm" style={{ color: '#c0c0c0' }}>
+          App Version: v{appInfo?.version ?? ''} &middot;{' '}
+          <a
+            href="https://jonclarke.dev/pension-planner/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            jonclarke.dev/pension-planner
+          </a>
+        </div>
       </footer>
     </div>
   );
