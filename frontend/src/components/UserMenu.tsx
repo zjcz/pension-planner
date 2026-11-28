@@ -1,19 +1,22 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../auth/AuthContext';
+import { ExportDialog } from './ExportDialog';
 
 interface UserMenuProps {
   onOpenSettings?: () => void;
   showSettings?: boolean;
+  onOpenExport?: () => void;
 }
 
-export function UserMenu({ onOpenSettings, showSettings = false }: UserMenuProps) {
+export function UserMenu({ onOpenSettings, showSettings = false, onOpenExport }: UserMenuProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const menuRef = useRef<Menu>(null);
+  const [exportVisible, setExportVisible] = useState(false);
 
   const onLogout = async () => {
     await logout();
@@ -39,6 +42,18 @@ export function UserMenu({ onOpenSettings, showSettings = false }: UserMenuProps
   }
 
   items.push({
+    label: 'Export',
+    icon: 'pi pi-download',
+    command: () => {
+      if (onOpenExport) {
+        onOpenExport();
+      } else {
+        setExportVisible(true);
+      }
+    },
+  });
+
+  items.push({
     label: 'Log Out',
     icon: 'pi pi-sign-out',
     command: onLogout,
@@ -54,6 +69,7 @@ export function UserMenu({ onOpenSettings, showSettings = false }: UserMenuProps
         aria-label="User menu"
         onClick={(event) => menuRef.current?.toggle(event)}
       />
+      <ExportDialog visible={exportVisible} onHide={() => setExportVisible(false)} />
     </>
   );
 }
