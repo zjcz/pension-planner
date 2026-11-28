@@ -216,4 +216,13 @@ export const handlers = [
     }),
   ),
   http.get(`${V1}/analytics`, () => HttpResponse.json(analytics)),
+  http.get(`${V1}/export`, () =>
+    new HttpResponse(new Uint8Array([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename="pension-planner-export.zip"',
+      },
+    }),
+  ),
 ];

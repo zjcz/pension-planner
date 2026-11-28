@@ -194,3 +194,14 @@ export interface StatePensionAuditEntry {
   takesEffectYear: number;
   notes: string | null;
 }
+
+export type ExportFormat = 'CSV' | 'XML' | 'JSON';
+
+export type ExportType = 'ALL' | 'PENSIONS' | 'STATEMENTS' | 'OTHER_INCOMES' | 'STATE_PENSION';
+
+export interface ExportParams {
+  format: ExportFormat;
+  type: ExportType;
+  includeStatements?: boolean;
+  pensionId?: number | null;
+}

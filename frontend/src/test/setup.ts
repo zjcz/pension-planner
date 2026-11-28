@@ -32,6 +32,11 @@ vi.mock('primereact/multiselect', async () => {
   return { default: MultiSelect, MultiSelect };
 });
 
+vi.mock('primereact/dropdown', async () => {
+  const { Dropdown } = await import('./mocks/dropdown');
+  return { default: Dropdown, Dropdown };
+});
+
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'error' });
 });
